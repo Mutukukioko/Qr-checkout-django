@@ -5,7 +5,14 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.shortcuts import HttpResponseRedirect
 from django.contrib import messages
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, ItemForm
+from .models import *
+import barcode
+from django.views import View
+from barcode.writer import ImageWriter
+
+
+
 
 def signup(request):
     # return render(request, 'user/signup.html')
@@ -25,13 +32,15 @@ def signup(request):
     else:
         form = CustomUserCreationForm()
         return render(request, 'user/signup.html', {'form': form})
+        
 
 def profile(request): 
-    return render(request, 'user/profile.html')
+    form = CustomUserCreationForm()
+    return render(request, 'user/profile.html', {'form': form})
 
 
 def home(request): 
-    return render(request, 'user/home.html')
+    return render(request, 'user/home.html',{'title':'Home'})
 
 def signin(request):
     # return render(request, 'user/signin.html')
@@ -51,3 +60,63 @@ def signin(request):
     form = AuthenticationForm()
     return render(request, 'user/signin.html', {'form':form,'title':'log in'})
 
+def cart(request):
+     products = Product.objects.all()
+     return render(request, 'user/cart.html',{'title':'cart', 'products':products})
+
+def dashboard(request):
+    products = Product.objects.all()
+    return render(request, 'user/dashboard.html',{'title':'Dashboard','products':products})
+
+def cartdash(request):
+    carts = CartItem.objects.all()
+    return render(request, 'user/cartdash.html',{'title':'Dashboard','carts':carts})
+
+
+
+
+def add(request):
+    if request.method == 'POST':
+        form = Product(request.POST, request.FILES)
+ 
+        if form.is_valid():
+            form.save()
+            return redirect('success')
+    else:
+        form = Product()
+ 
+    return render(request, 'user/add.html',{'form': form,'title':'add'})
+
+
+class ScanView(View):
+    template_name = 'user/barcode.html'
+
+    def get(self, request):
+        form = ItemForm()
+        return render(request, self.template_name, {'form': form})
+
+class ResultView(View):
+    def post(self, request):
+        form = ItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.barcode = request.POST['barcode']
+            item.save()
+            return HttpResponseRedirect('/barcode/')
+        return render(request, 'user/barcode.html', {'form': form})
+
+
+def shopProduct(request):
+    products = Product.objects.all()
+    return render(request, 'user/shop_product.html', {'title':'Shopproducts','products':products})
+
+def userBarcode(request):
+    form = ItemForm()
+    return render(request, 'user/user_barcode.html',{'form': form})
+
+def paymentVal(request):
+    return render(request, 'user/payment_validation.html')
+
+def scanStore(request):
+    form = ItemForm()
+    return render(request, 'user/scan_store.html', {'form': form})

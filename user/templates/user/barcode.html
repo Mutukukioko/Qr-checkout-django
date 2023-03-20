@@ -1,0 +1,177 @@
+{% extends "user/base.html" %}
+{% load static %}
+{% block title %}
+Scan Barcode
+{% endblock %}
+{% block content %}
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="" class="brand-link">
+        <img src="" alt="" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">Qr Admin</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+
+            <div class="info">
+                <a href="#" class="d-block">{{username}}</a>
+            </div>
+        </div>
+
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class
+           with font-awesome or any other icon font library -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>
+                            Dashboard
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Dashboard v1</p>
+                            </a>
+                        </li>
+
+                </li>
+            </ul>
+            </li>
+
+
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content">
+        <div class="container-fluid">
+            <br>
+            <br>
+            <div class="row">
+                <div id="scan-area">
+                    <video id="video"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                </div>
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Quick Example</h3>
+                    </div>
+                    {% csrf_token %}
+                    <form id="scan-form" method="post">
+
+                        <div class="form-group">
+                            <label for="{{ form.name.id_for_label }}">Product name:</label>
+                            <div class="input-group">
+                                {{ form.name }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.barcode.id_for_label }}">Product Barcode:</label>
+                            <div class="input-group">
+                                {{ form.barcode }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.price.id_for_label }}">Product Price:</label>
+                            <div class="input-group">
+                                {{ form.price }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.price.id_for_label }}">Product image:</label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    {{form.image}}
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit">Submit</button>
+
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <button id="start-scan-button">Start Scan</button>
+                <button id="stop-scan-button">Stop Scan</button>
+            </div>
+        </div>
+
+        <script>
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const scanArea = document.getElementById('scan-area');
+            const barcodeInput = document.getElementById('barcode-input');
+            const startScanButton = document.getElementById('start-scan-button');
+
+            const stopScanButton = document.getElementById('stop-scan-button');
+
+            let scanInterval;
+
+            const startScan = () => {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                    .then((stream) => {
+                        video.srcObject = stream;
+                        video.play();
+                        stopScanButton.style.display = 'block';
+                        startScanButton.style.display = 'none';
+                        scanInterval = setInterval(scan, 100);
+                    })
+                    .catch((error) => {
+                        console.error('Unable to access the camera.', error);
+                    });
+            };
+
+            const stopScan = () => {
+                clearInterval(scanInterval);
+                video.srcObject.getTracks().forEach(track => track.stop());
+                startScanButton.style.display = 'block';
+                scanArea.style.display = 'none';
+            };
+
+            const scan = () => {
+                const width = video.videoWidth;
+                const height = video.videoHeight;
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, width, height);
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                if (code) {
+                    console.log('Barcode value:', code.data);
+                    //  update barcode tag value
+                    barcodeInput.value = code.data;
+                    // barcodeTag.innerText = code.data;
+                    scanArea.style.display = 'none';
+                    stopScan();
+
+                }
+            }
+
+            startScanButton.addEventListener('click', startScan);
+            stopScanButton.addEventListener('click', stopScan);
+
+
+        </script>
+
+</div>
+</section>
+
+
+{% endblock %}

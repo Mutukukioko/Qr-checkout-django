@@ -1,2 +1,155 @@
 {% extends 'user/base.html' %}
-  
+{% load static %}
+{% block title %}
+Scanner
+{% endblock %}
+{% block content %}
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <!-- Brand Logo -->
+  <a href="" class="brand-link">
+    <img src="" alt="" class="brand-image img-circle elevation-3" style="opacity: .8">
+    <span class="brand-text font-weight-light">Qr Admin</span>
+  </a>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Sidebar user (optional) -->
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+
+      <div class="info">
+        <a href="#" class="d-block">{{username}}</a>
+      </div>
+    </div>
+
+    <!-- SidebarSearch Form -->
+    <div class="form-inline">
+      <div class="input-group" data-widget="sidebar-search">
+        <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+        <div class="input-group-append">
+          <button class="btn btn-sidebar">
+            <i class="fas fa-search fa-fw"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <!-- Add icons to the links using the .nav-icon class
+           with font-awesome or any other icon font library -->
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p>
+              Dashboard
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Dashboard v1</p>
+              </a>
+            </li>
+
+        </li>
+      </ul>
+      </li>
+
+
+      </ul>
+    </nav>
+    <!-- /.sidebar-menu -->
+  </div>
+  <!-- /.sidebar -->
+</aside>
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container">
+      <h4 class="text-center text-dark">QC</h4>
+      <hr>
+      <div class="row">
+        <div class="col-md-6">
+          <video id="preview"></video>
+          <i class="fa fa-camera-retro" aria-hidden="true"></i>
+          <div class="col-md-6">
+            <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
+              <label class="btn btn-primary active">
+                <input type="radio" name="options" value="1" autocomplete="off" checked> Front Camera
+              </label>
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" value="2" autocomplete="off"> Back Camera
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <form method="post" action="../barcode/check.php">
+            <label>Item bar code Value</label>
+            <input type="text" value="" name="qrvalue" id="qrvalue" readonly="" class="form-control" required>
+            <span id="msg"></span>
+
+            <div id="qr"></div>
+
+            <div class="pt-4"></div>
+            <div class="col-md-5">
+              <button type="submit" name="add" class="btn bg-indigo ">Add to cart</button>
+            </div>
+          </form>
+        </div>
+
+
+      </div>
+
+      <script type="text/javascript">
+        let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
+        scanner.addListener('scan', function (content) {
+          alert(content);
+          document.getElementById('qrvalue').value = content;
+          document.getElementById('qrvalue').innerHTML = content;
+
+          jQuery.ajax({
+            url: "",
+            data: 'qrvalue=' + $("#qrvalue").val(),
+            type: "POST",
+            success: function (data) {
+              $("#qr").html(data);
+
+            },
+            error: function () { }
+          });
+
+        });
+        Instascan.Camera.getCameras().then(function (cameras) {
+          if (cameras.length > 0) {
+            scanner.start(cameras[0]);
+            $('[name="options"]').on('change', function () {
+              if ($(this).val() == 1) {
+                if (cameras[0] != "") {
+                  scanner.start(cameras[0]);
+                } else {
+                  alert('No Front camera found!');
+                }
+              } else if ($(this).val() == 2) {
+                if (cameras[1] != "") {
+                  scanner.start(cameras[1]);
+                } else {
+                  alert('No Back camera found!');
+                }
+              }
+            });
+          } else {
+            console.error('No cameras found.');
+            alert('No cameras found.');
+          }
+        }).catch(function (e) {
+          console.error(e);
+          alert(e);
+        });
+      </script>
+    </div>
+  </section>
+  {% endblock %}

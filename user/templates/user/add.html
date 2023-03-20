@@ -1,0 +1,22 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}
+Scanner
+{% endblock %}
+{% block content %}
+
+<input id="barcode-input" type="text" />
+
+  <script src="{% static 'barcode/js/jquery.js' %}"></script>
+  <script src="{% static 'barcode/js/jquery-barcode.js' %}"></script>
+  <script>
+    $(document).keydown(function(e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        $('#barcode-input').val(e.target.value);
+        e.target.value = '';
+      }
+    });
+    $('#barcode-input').barcodeListener();
+  </script>
+{% endblock %}

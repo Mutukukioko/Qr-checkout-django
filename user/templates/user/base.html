@@ -3,34 +3,27 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="title" content="project">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta name="language" content="English">
-  <meta name="author" content="vinayak sharma">
-
-  <title>{{title}}</title>
-
-
-  <!-- bootstrap file -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <!-- bootstrap file-->
-
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-
-  <!-- main css -->
-  <link rel="stylesheet" type="text/css" href="{% static 'user/index.css' %}" />
-
-
-  <!-- message here -->
-
+ <!-- Google Font: Source Sans Pro -->
+ <link rel="stylesheet"
+ href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="{% static 'user/assets/plugins/fontawesome-free/css/all.min.css' %}">
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'user/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'user/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'user/assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+<!-- Theme style -->
+<link rel="stylesheet" href="{% static 'user/assets/dist/css/adminlte.min.css' %}">
+<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+<script src="{% static 'user/assets/jsQR-master/dist/jsQR.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.rawgit.com/LazarSoft/jsqrcode/master/src/qr_packed.js"></script>
+  <title>
+    {% block title %}
+    {{title}}
+    {% endblock %}
+  </title>
   {% if messages %}
   {% for message in messages %}
 
@@ -44,46 +37,74 @@
 
 </head>
 
-<body class="container-fluid">
+<body class="hold-transition sidebar-mini">
 
 
-  <header class="row">
+  <div class="wrapper">
+    <!-- Navbar -->
+    
 
-    <!-- navbar-->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button class="navbar-toggle" data-toggle="collapse" data-target="#mainNavBar">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" class="styleheader" href="{% url "home" %}">QR CHECKOUT</a>
-        </div>
-        <div class="collapse navbar-collapse" id="mainNavBar">
-          <ul class="nav navbar-nav navbar-right">
-            
+   
+    <nav class="navbar navbar-expand navbar-primary navbar-dark">
+      <!-- Left navbar links -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        
+      </ul>
 
-            {% if user.is_authenticated %}
-            <li><a href="{% url "home" %}">Home</a></li>
-            <li><a href="{% url "signin" %}"><span class="glyphicon glyphicon-log-out"></span> &nbsp; Logout</a></li>
-            {% else %}
-            <li><a href="{% url "signup" %}"><span class="glyphicon glyphicon-user"></span> &nbsp; Sign up</a></li>
-            <li><a href="{% url "signin" %}"><span class="glyphicon glyphicon-log-in"></span> &nbsp; Log in</a></li>
-            {% endif %}
+      <!-- Right navbar links -->
+      <ul class="navbar-nav ml-auto">
+        
 
-          </ul>
-        </div>
-      </div>
+        {% if user.is_authenticated %}
+        <li class="nav-item"><a class="nav-link" href="{% url "home" %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url "profile" %}">  <i class="fas fa-th-large"></i><span class="glyphicon glyphicon-user"></span> &nbsp; profile</a></li>
+
+        <li class="nav-item"><a class="nav-link" href="{% url "signin" %}"><span class="glyphicon glyphicon-log-out">  <i class="fas fa-th-large"></i></span> &nbsp; Logout</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url "cart" %}">  <i class="fas fa-cart-plus fa-md mr-2"></i><span class="glyphicon glyphicon-shopping-cart"></span>Cart</a></li>
+
+        {% else %}
+        <li class="nav-item"><a class="nav-link" href="{% url "signup" %}"> <i class="fas fa-th-large"></i><span class="glyphicon glyphicon-user"></span> &nbsp; Sign up</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url "signin" %}"  > <i class="fas fa-th-large"></i><span class="glyphicon glyphicon-log-in"></span> &nbsp; Log in</a></li>
+        
+        {% endif %}
+        
+        <li class="nav-item">
+          <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+            <i class="fas fa-th-large"></i>
+          </a>
+        </li>
+      </ul>
     </nav>
-  </header>
-  <br/>
-  <br>
-  <br>
+    
+  
 {% block content %} 
 
 {% endblock %}
+</div>
+ 
+  <!-- jQuery -->
+  <script src="{% static 'user/assets/plugins/jquery/jquery.min.js' %}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{% static 'user/assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- DataTables  & Plugins -->
+  <script src="{% static 'user/assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/jszip/jszip.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/pdfmake/pdfmake.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/pdfmake/vfs_fonts.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+  <!-- AdminLTE App -->
+  <script src="{% static 'user/assets/dist/js/adminlte.min.js' %}"></script>
+  
   </body>
 
 </html>
