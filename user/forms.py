@@ -46,4 +46,4 @@ class Shop_Form(forms.ModelForm):
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ('name', 'barcode', 'price', 'image')
+        fields = "__all__"

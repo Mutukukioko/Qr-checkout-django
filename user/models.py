@@ -50,7 +50,16 @@ class Shop(models.Model):
         return self.shop_name
     
 class Item(models.Model):
+    CATEGORY = (
+        ('Kitchen','Home appliance'),
+        ('Cloths','Shoes'),
+        ('electricals','non electric'),
+    )
     name = models.CharField(max_length=100)
+    shop_id = models.ForeignKey(Shop, on_delete = models.CASCADE)
+    category = models.CharField(max_length = 254, null=True, choices= CATEGORY)
+    brand = models.CharField(max_length = 254,default = "" )
+    quantity = models.CharField(max_length = 254, default = "")
     barcode = models.CharField(max_length=100, unique=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
     image = models.ImageField(upload_to='item_images', null=True, blank=True)

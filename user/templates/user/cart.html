@@ -1,77 +1,15 @@
 {% extends "user/base.html" %}
 {% block title %}
-Login
+Cart
 {% endblock %}
 {% block content %}
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
-  <!-- Brand Logo -->
-  <a href="" class="brand-link">
-    <img src="" alt="" class="brand-image img-circle elevation-3" style="opacity: .8">
-    <span class="brand-text font-weight-light">Qr Admin</span>
-  </a>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <!-- Sidebar user (optional) -->
-    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-
-      <div class="info">
-        <a href="#" class="d-block">{{username}}</a>
-      </div>
-    </div>
-
-    <!-- SidebarSearch Form -->
-    <div class="form-inline">
-      <div class="input-group" data-widget="sidebar-search">
-        <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-        <div class="input-group-append">
-          <button class="btn btn-sidebar">
-            <i class="fas fa-search fa-fw"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sidebar Menu -->
-    <nav class="mt-2">
-      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-        <!-- Add icons to the links using the .nav-icon class
-           with font-awesome or any other icon font library -->
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-tachometer-alt"></i>
-            <p>
-              Dashboard
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Dashboard v1</p>
-              </a>
-            </li>
-
-        </li>
-      </ul>
-      </li>
-
-
-      </ul>
-    </nav>
-    <!-- /.sidebar-menu -->
-  </div>
-  <!-- /.sidebar -->
-</aside>
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
-        <div class="col-sm-6">
-          <h1>DataTables</h1>
-        </div>
+       
 
       </div>
     </div><!-- /.container-fluid -->
@@ -88,15 +26,17 @@ Login
             <div class="card-body p-0">
               <ul class="products-list product-list-in-card pl-2 pr-2">
                 <li class="item">
+                  {% for item_id, quantity in cart.items %}
                   <div class="product-img">
                     <img src="media/img/jorgen-hendriksen-lX2YG5w4_gs-unsplash.jpg" alt="Product Image"
                       class="img-size-50">
                   </div>
+                  
                   <div class="product-info">
-                    <a href="javascript:void(0)" class="product-title">Samsung TV
+                    <a href="javascript:void(0)" class="product-title">{{ item_id }}
                       <span class="badge badge-warning float-right">Ksh 1800</span></a>
                     <span class="product-description">
-                      Samsung 32" 1080p 60Hz LED Smart HDTV.
+                      {{ quantity }}
 
                       <input type="number" class="d-sm-block float-right disabled">
 
@@ -108,6 +48,7 @@ Login
                       </button>
                     </div>
                   </div>
+                  {% endfor %}
                 </li>
 
 

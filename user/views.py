@@ -10,9 +10,11 @@ from .models import *
 import barcode
 from django.views import View
 from barcode.writer import ImageWriter
+from django.contrib.auth.decorators import login_required
 
-
-
+def logout_view(request):
+    logout(request)
+    return redirect('signin')
 
 def signup(request):
     # return render(request, 'user/signup.html')
@@ -33,20 +35,35 @@ def signup(request):
         form = CustomUserCreationForm()
         return render(request, 'user/signup.html', {'form': form})
         
-
+@login_required(login_url='/signin')
 def profile(request): 
-    form = CustomUserCreationForm()
-    return render(request, 'user/profile.html', {'form': form})
+    if request.user.is_authenticated:
+        # If the user is authenticated, show their details
+        username = request.user.username
+        first_name = request.user.first_name
+        last_name = request.user.last_name
+        email = request.user.email
+        return render(request, 'user/profile.html', {
+            'username': username,
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+        })
+    else:
+        # If the user is not authenticated, redirect them to the login page
+        return redirect('signin')
 
 
+@login_required(login_url='/signin')
 def home(request): 
     return render(request, 'user/home.html',{'title':'Home'})
+
 
 def signin(request):
     # return render(request, 'user/signin.html')
     if request.method == 'POST':
 
-        #AuthenticationForm_can_also_be_used__
+        #AuthenticationForm_can_also_be_used
 
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -60,21 +77,25 @@ def signin(request):
     form = AuthenticationForm()
     return render(request, 'user/signin.html', {'form':form,'title':'log in'})
 
+@login_required(login_url='/signin')
 def cart(request):
      products = Product.objects.all()
      return render(request, 'user/cart.html',{'title':'cart', 'products':products})
 
+@login_required(login_url='/signin')
 def dashboard(request):
     products = Product.objects.all()
     return render(request, 'user/dashboard.html',{'title':'Dashboard','products':products})
 
+
+@login_required(login_url='/signin')
 def cartdash(request):
     carts = CartItem.objects.all()
     return render(request, 'user/cartdash.html',{'title':'Dashboard','carts':carts})
 
 
 
-
+@login_required(login_url='/signin')
 def add(request):
     if request.method == 'POST':
         form = Product(request.POST, request.FILES)
@@ -87,13 +108,13 @@ def add(request):
  
     return render(request, 'user/add.html',{'form': form,'title':'add'})
 
-
 class ScanView(View):
     template_name = 'user/barcode.html'
 
     def get(self, request):
         form = ItemForm()
         return render(request, self.template_name, {'form': form})
+
 
 class ResultView(View):
     def post(self, request):
@@ -106,10 +127,12 @@ class ResultView(View):
         return render(request, 'user/barcode.html', {'form': form})
 
 
+@login_required(login_url='/signin')
 def shopProduct(request):
     products = Product.objects.all()
     return render(request, 'user/shop_product.html', {'title':'Shopproducts','products':products})
 
+@login_required(login_url='/signin')
 def userBarcode(request):
     form = ItemForm()
     return render(request, 'user/user_barcode.html',{'form': form})
@@ -120,3 +143,40 @@ def paymentVal(request):
 def scanStore(request):
     form = ItemForm()
     return render(request, 'user/scan_store.html', {'form': form})
+
+
+@login_required(login_url='/signin')
+def add_cart (request, item_id):
+    if request.user.is_authenticated:
+        # retrieve the cart from the session or create a new one
+        cart = Cart.objects.filter(user=request.user)
+        cart = request.session.get('cart', {})
+        
+         # add the item to the cart or update the quantity if already in the cart
+        cart[item_id] = cart.get(item_id, 0) + 1
+        
+       
+  # save the updated cart to the session
+        request.session['cart'] = cart
+
+    # redirect to the cart page
+        return render(request, 'user/add.html', {'cart': cart})
+
+    else:
+        # handle the case where the user is not logged in
+        return render(request, 'user/home.html', {'cart': cart})
+   
+    
+
+@login_required(login_url='/signin')  
+def view_cart(request):
+    
+    # retrieve the cart from the session or create a new one
+         cart = request.session.get('cart', {})
+
+    # render the cart template with the cart items
+         return render(request, 'user/cart.html', {'cart': cart})
+         
+  
+
+    
