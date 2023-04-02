@@ -1,7 +1,7 @@
-{% extends 'user/base.html' %}
+{% extends 'user/adminbase.html' %}
 {% load static %}
 {% block title %}
-Scanner
+Shops Product
 {% endblock %}
 {% block content %}
 
@@ -51,14 +51,14 @@ Scanner
                     <td>{{ i.quantity}}</td>
                     <td><img src="{{ i.picture.url }}" alt="Image"></td>
                     <td>
-                      <div class="input-group input-group-lg mb-3">
+                      <div class="input-group input-group-md mb-3">
                         <div class="input-group-prepend">
                           <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
                             Action
                           </button>
                           <ul class="dropdown-menu">
-                            <li class="dropdown-item"><a href="#">Action</a></li>
-                            <li class="dropdown-item"><a href="#">Another action</a></li>
+                            <li class="dropdown-item"><a href="#">Delete</a></li>
+                            <li class="dropdown-item"><a href="#">Edit</a></li>
                           </ul>
                         </div>
                       </div>

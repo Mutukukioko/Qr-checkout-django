@@ -27,18 +27,18 @@ Scanner
           </div>
         </div>
         <div class="col-md-6">
-          
-          <form method="Post" >
-            {% csrf_token %}
+
+          <form id="myForm">
+
             <label>Item bar code Value</label>
-            <input type="text" value="" name="qrvalue" id="qrvalue" readonly="" class="form-control" required>
+            <input type="text" value="" name="barcode" id="barcode" class="form-control" required>
             <span id="msg"></span>
 
             <div id="qr"></div>
 
             <div class="pt-4"></div>
             <div class="col-md-5">
-              <button type="submit" name="add" class="btn bg-indigo ">Add to cart</button>
+              <button type="submit" class="btn bg-indigo ">Add to cart</button>
             </div>
           </form>
         </div>
@@ -50,19 +50,10 @@ Scanner
         let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
         scanner.addListener('scan', function (content) {
           alert(content);
-          document.getElementById('qrvalue').value = content;
-          document.getElementById('qrvalue').innerHTML = content;
+          document.getElementById('barcode').value = content;
+          document.getElementById('barcode').innerHTML = content;
 
-          jQuery.ajax({
-            url: "",
-            data: 'qrvalue=' + $("#qrvalue").val(),
-            type: "POST",
-            success: function (data) {
-              $("#qr").html(data);
-
-            },
-            error: function () { }
-          });
+          
 
         });
         Instascan.Camera.getCameras().then(function (cameras) {
@@ -91,6 +82,68 @@ Scanner
           console.error(e);
           alert(e);
         });
+
+        // Get the form element
+        var form = document.getElementById("myForm");
+
+        // Get the success message element
+        var successMessage = document.getElementById("success-message");
+
+        // Add an event listener to the form submit event
+        form.addEventListener("submit", function (event) {
+          // Prevent the default form submission behavior
+          event.preventDefault();
+
+          // Get the value of the barcode input field
+          var barcode = document.getElementById("barcode").value;
+
+          // Get the CSRF token from the cookie
+          var csrftoken = getCookie('csrftoken');
+
+          // Set the CSRF token as a header in the AJAX request
+          $.ajaxSetup({
+            headers: {
+              'X-CSRFToken': csrftoken
+            }
+          });
+
+          // Send the barcode to the server using AJAX
+          $.ajax({
+            url: "/store_cart/",
+            type: "POST",
+            data: { "barcode": barcode },
+            success: function (data) {
+              // Show success message
+              var successMsg = "Cart stored successfully!";
+              $("#msg").html(successMsg).show();
+
+              // Hide success message after 3 seconds
+              setTimeout(function () {
+                successMessage.style.display = "none";
+              }, 3000);
+            },
+            error: function () {
+              // Handle error
+            }
+          });
+        });
+
+        // Function to retrieve a cookie by name
+        function getCookie(name) {
+          var cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+              var cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
       </script>
     </div>
   </section>

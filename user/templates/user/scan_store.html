@@ -18,10 +18,10 @@ Scan Store
                 </div>
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Add Products</h3>
+                        <h3 class="card-title">Scan the Store's QR </h3>
                     </div>
                     {% csrf_token %}
-                    <form id="scan-form" method="post" class="col-md-8">
+                    <form id="scan-form" method="post" class="col-lg-12 pb-3">
 
                         <div class="form-group">
                             <label for="{{ form.name.id_for_label }}">Store name:</label>
@@ -35,13 +35,17 @@ Scan Store
                             <div class="input-group">
                                 {{ form.barcode }}
                             </div>
+                            <div class="row col-md-12 pt-2">
 
-                <button id="start-scan-button">Start Scan</button>
-                <button id="stop-scan-button">Stop Scan</button>
+                                <div class="pr-1"><button id="start-scan-button">Start Scan</button></div>
+                                <div class=" pr-2"><button id="stop-scan-button" >Stop Scan</button></div>
+                            </div>
                         </div>
 
-                        
-                        <button type="submit">Submit</button>
+                        <div class="center">
+
+                        <button type="submit" class="btn btn-info pr-4 pl-4">Submit</button>
+                        </div>
 
                     </form>
                 </div>

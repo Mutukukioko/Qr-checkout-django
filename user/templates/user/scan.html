@@ -1,7 +1,7 @@
 {% extends "user/base.html" %}
 {% load static %}
 {% block title %}
-Scan Product
+Scan Store
 {% endblock %}
 {% block content %}
 
@@ -18,31 +18,30 @@ Scan Product
                 </div>
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Scan Products Barcode</h3>
+                        <h3 class="card-title">Add Products</h3>
                     </div>
-                    
-                    <form id="myForm"class="col-lg-12 pb-3">
+                    {% csrf_token %}
+                    <form id="scan-form" method="post" class="col-md-8">
 
                         <div class="form-group">
-                            <label for="{{ form.name.id_for_label }}">Product name:</label>
+                            <label for="{{ form.name.id_for_label }}">Store name:</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" name="name" id="name">
+                                {{ form.name }}
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="{{ form.barcode.id_for_label }}">Barcode value:</label>
-                            <input type="text"  class="form-control" name="barcode" id="barcode" >
-                            <span id="msg" class="badge badge-success float-right"></span>
-                            <span id="msgs" class="badge badge-danger float-right"></span>
-                          
+                            <label for="{{ form.barcode.id_for_label }}">Store Qr:</label>
+                            <div class="input-group">
+                                {{ form.barcode }}
                             </div>
-                           
-                            <div class="row col-md-12 pt-2">
-                                <div class="pl-1"><button type="submit" class="btn btn-info pl-2">Submit</button></div>
-                                <div class="pl-1"><button id="start-scan-button" class="btn btn-success"> Scan</button></div>
-                                <div class=" pl-1 "><button id="stop-scan-button"  class="btn btn-warning">StopScan</button></div>
-                            </div>
+
+                <button id="start-scan-button">Start Scan</button>
+                <button id="stop-scan-button">Stop Scan</button>
+                        </div>
+
+                        
+                        <button type="submit">Submit</button>
 
                     </form>
                 </div>
@@ -54,7 +53,7 @@ Scan Product
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
             const scanArea = document.getElementById('scan-area');
-            const barcodeInput = document.getElementById('barcode');
+            const barcodeInput = document.getElementById('barcode-input');
             const startScanButton = document.getElementById('start-scan-button');
 
             const stopScanButton = document.getElementById('stop-scan-button');
@@ -97,7 +96,6 @@ Scan Product
                     barcodeInput.value = code.data;
                     // barcodeTag.innerText = code.data;
                     scanArea.style.display = 'none';
-                    
                     stopScan();
 
                 }
@@ -106,72 +104,6 @@ Scan Product
             startScanButton.addEventListener('click', startScan);
             stopScanButton.addEventListener('click', stopScan);
 
-
-
-// Get the form element
-var form = document.getElementById("myForm");
-
-// Get the success message element
-var successMessage = document.getElementById("msg");
-
-
-// Add an event listener to the form submit event
-form.addEventListener("submit", function(event) {
-  // Prevent the default form submission behavior
-  event.preventDefault();
-
-  // Get the value of the qrvalue input field
-  var barcode = document.getElementById("barcode").value;
-
-  // Get the CSRF token from the cookie
-  var csrftoken = getCookie('csrftoken');
-
-  // Set the CSRF token as a header in the AJAX request
-  $.ajaxSetup({
-    headers: {
-      'X-CSRFToken': csrftoken
-    }
-  });
-
-  // Send the qrvalue to the server using AJAX
-  $.ajax({
-    url: "/store_cart/",
-    type: "POST",
-    data: {"barcode": barcode},
-    success: function(data) {success-message
-      // Show success message
-      var successMsg = "Cart stored successfully!";
-      $("#msg").html(successMsg).show();
-
-      // Hide success message after 3 seconds
-      setTimeout(function() {
-        successMessage.style.display = "none";
-      }, 3000);
-    },
-    error: function() {
-      // Handle error
-      var successMsg = "Error";
-      $("#msgs").html(successMsg).show();
-    }
-  });
-});
-// Function to retrieve a cookie by name
-function getCookie(name) {
-  var cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    var cookies = document.cookie.split(';');
-    for (var i = 0; i < cookies.length; i++) {
-      var cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
-            
 
         </script>
 

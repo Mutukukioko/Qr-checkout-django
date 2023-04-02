@@ -7,7 +7,7 @@ from django.shortcuts import HttpResponseRedirect
 from django.contrib import messages
 from .forms import CustomUserCreationForm, ItemForm
 from .models import *
-import barcode
+from django.http import HttpResponse
 from django.views import View
 from barcode.writer import ImageWriter
 from django.contrib.auth.decorators import login_required
@@ -58,6 +58,10 @@ def profile(request):
 def home(request): 
     return render(request, 'user/home.html',{'title':'Home'})
 
+@login_required(login_url='/signin')
+def admin_home(request): 
+    return render(request, 'user/home2.html',{'title':'Home'})
+
 
 def signin(request):
     # return render(request, 'user/signin.html')
@@ -79,8 +83,13 @@ def signin(request):
 
 @login_required(login_url='/signin')
 def cart(request):
-     products = Product.objects.all()
-     return render(request, 'user/cart.html',{'title':'cart', 'products':products})
+    cart = request.session.get('cart', {})
+    barcode = cart.get('barcode', '')
+    context = {
+        'barcode': barcode,
+        'cart_items': cart.items()
+    }
+    return render(request, 'user/cart.html', context)
 
 @login_required(login_url='/signin')
 def dashboard(request):
@@ -170,13 +179,52 @@ def add_cart (request, item_id):
 
 @login_required(login_url='/signin')  
 def view_cart(request):
-    
-    # retrieve the cart from the session or create a new one
-         cart = request.session.get('cart', {})
-
+    cart_items = []
+    cart = request.session.get('cart', {})
+    for barcodevalue, item in cart.items():
+        cart_item = {
+            'barcodevalue': barcodevalue,
+            'quantity': item['quantity']
+        }
+        cart_items.append(cart_item)
     # render the cart template with the cart items
-         return render(request, 'user/cart.html', {'cart': cart})
+    return render(request, 'user/cart.html', {'cart': cart_items})
          
   
+def store_cart(request):
+    cart = request.session.get('cart', {})
+    barcodevalue = request.POST.get('barcode')
+    if barcodevalue:
+        if barcodevalue in cart:
+            # if the barcode value already exists in the cart, increment its quantity
+            cart[barcodevalue]['quantity'] += 1
+        else:
+            # if it doesn't exist, add it to the cart with a quantity of 1
+            cart[barcodevalue] = {'quantity': 1}
+    request.session['cart'] = cart
+    return  HttpResponse(status = 200)
+
 
     
+
+    # return render(request, 'user/home.html')
+    
+def generate_barcode(request):
+        form = ItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.barcode = request.POST['barcode']
+            item.save()
+            return HttpResponseRedirect('/barcode/')
+        return render(request, 'user/barcode.html', {'form': form})
+
+
+def remove_item(request):
+    if request.method == "POST":
+        barcode_value = request.POST.get("barcode_value")
+        if barcode_value in request.session["cart"]:
+            del request.session["cart"][barcode_value]
+            request.session.modified = True
+            messages.success(request, f' item removed!!')
+    return redirect('view_cart')
+

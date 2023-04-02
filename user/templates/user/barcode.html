@@ -1,7 +1,7 @@
 {% extends "user/base.html" %}
 {% load static %}
 {% block title %}
-Scan Barcode
+Add Products
 {% endblock %}
 {% block content %}
 
@@ -12,100 +12,151 @@ Scan Barcode
             <br>
             <br>
             <div class="row">
-                <div id="scan-area">
-                    <div id = "reader" width="600px"></div>
+               <div id="scan-area">
+                    <video id="video"></video>
+                    <canvas id="canvas" style="display:none; "></canvas>
                 </div>
-                <div class="card card-primary">
+                <div class="card card-primary ">
                     <div class="card-header">
-                        <h3 class="card-title">Quick Example</h3>
+                        <h3 class="card-title">Add Product</h3>
                     </div>
                     {% csrf_token %}
-                    <form id="scan-form" method="post">
-
-                        <div class="form-group">
-                            <label for="{{ form.shop_id.id_for_label }}">shop :</label>
-                            <div class="input-group">
-                                {{ form.shop_id }}
+                    <form id="scan-form" class="col-md-12 pb-3" method="post">
+                        <div class="row pr-2">
+                            <div class="form-group  pl-2">
+                                <label for="{{ form.shop_id.id_for_label }}">shop :</label>
+                                <div class="input-group">
+                                    {{ form.shop_id }}
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="{{ form.name.id_for_label }}">Product name:</label>
-                            <div class="input-group">
-                                {{ form.name }}
+                            <div class="form-group  pl-5">
+                                <label for="{{ form.category.id_for_label }}">Category :</label>
+                                <div class="input-group">
+                                    {{ form.category}}
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="{{ form.category.id_for_label }}">Category :</label>
-                            <div class="input-group">
-                                {{ form.category}}
+
+
+                        </div>
+                        <div class="row pr-2">
+
+                            <div class="form-group  pl-1">
+                                <label for="{{ form.name.id_for_label }}">Product name:</label>
+                                <div class="input-group ">
+                                    {{ form.name }}
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="{{ form.brand.id_for_label }}">Brand :</label>
-                            <div class="input-group">
-                                {{ form.brand}}
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="{{ form.quantity.id_for_label }}">Quantity :</label>
-                            <div class="input-group">
-                                {{ form.quantity}}
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="{{ form.barcode.id_for_label }}">Product Barcode:</label>
-                            <div class="input-group" id = "barcode">
-                                {{ form.barcode }}
-                            </div>
-                        </div>
-                       
-
-                        <div class="form-group">
-                            <label for="{{ form.price.id_for_label }}">Product Price:</label>
-                            <div class="input-group">
-                                {{ form.price }}
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="{{ form.picture.id_for_label }}">Product image:</label>
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    {{form.image}}
+                            <div class="form-group pl-3 ">
+                                <label for="{{ form.brand.id_for_label }}">Brand :</label>
+                                <div class="input-group">
+                                    {{ form.brand}}
                                 </div>
                             </div>
                         </div>
-                        <button type="submit">Submit</button>
+                        <div class="row pr-2">
+                            <div class="form-group pl-1">
+                                <label for="{{ form.quantity.id_for_label }}">Quantity :</label>
+                                <div class="input-group">
+                                    {{ form.quantity}}
+                                </div>
+                            </div>
 
+                            <div class="form-group pl-3">
+                                <label for="{{ form.barcode.id_for_label }}">Product Barcode:</label>
+                                <div class="input-group" id="barcode">
+                                    {{ form.barcode }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row pr-2">
+
+                            <div class="form-group pl-1">
+                                <label for="{{ form.price.id_for_label }}">Product Price:</label>
+                                <div class="input-group">
+                                    {{ form.price }}
+                                </div>
+                            </div>
+
+                            <div class="form-group pl-2">
+                                <label for="{{ form.picture.id_for_label }}">Product image:</label>
+                                <div class="input-group">
+                                    <div class="custom-file">
+                                        {{form.image}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row col-md-12 pt-2">
+                            <button type="submit" class="btn btn-info pl-2">Submit</button>
+                            <div class="pl-1"><button id="start-scan-button" class="btn btn-success">Start Scan</button></div>
+                            <div class=" pl-1 pr-2"><button id="stop-scan-button" class="btn btn-warning">Stop Scan</button></div>
+                        </div>
                     </form>
                 </div>
             </div>
-          
+
         </div>
-<script>
-   function onScanSuccess(decodedText, decodedResult) {
-  // handle the scanned code as you like, for example:
-  console.log(`Code matched = ${decodedText}`, decodedResult);
-  document.getElementById("barcode").innerHTML = decodedText;
+        <script>
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const scanArea = document.getElementById('scan-area');
+            const barcodeInput = document.getElementById('barcode-input');
+            const startScanButton = document.getElementById('start-scan-button');
 
-}
+            const stopScanButton = document.getElementById('stop-scan-button');
 
-function onScanFailure(error) {
-  // handle scan failure, usually better to ignore and keep scanning.
-  // for example:
-  console.warn(`Code scan error = ${error}`);
-}
+            let scanInterval;
 
-let html5QrcodeScanner = new Html5QrcodeScanner(
-  "reader",
-  { fps: 10, qrbox: {width: 250, height: 250} },
-  /* verbose= */ false);
-html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            const startScan = () => {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                    .then((stream) => {
+                        video.srcObject = stream;
+                        video.play();
+                        stopScanButton.style.display = 'block';
+                        startScanButton.style.display = 'none';
+                        scanInterval = setInterval(scan, 100);
+                    })
+                    .catch((error) => {
+                        console.error('Unable to access the camera.', error);
+                    });
+            };
+
+            const stopScan = () => {
+                clearInterval(scanInterval);
+                video.srcObject.getTracks().forEach(track => track.stop());
+                startScanButton.style.display = 'block';
+                scanArea.style.display = 'none';
+            };
+
+            const scan = () => {
+                const width = video.videoWidth;
+                const height = video.videoHeight;
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, width, height);
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                if (code) {
+                    console.log('Barcode value:', code.data);
+                    //  update barcode tag value
+                    barcodeInput.value = code.data;
+                    // barcodeTag.innerText = code.data;
+                    scanArea.style.display = 'none';
+                    stopScan();
+
+                }
+            }
+
+            startScanButton.addEventListener('click', startScan);
+            stopScanButton.addEventListener('click', stopScan);
+
+
         </script>
 
 </div>

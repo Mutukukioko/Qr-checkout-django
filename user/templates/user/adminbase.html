@@ -106,7 +106,7 @@
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             {% if user.is_authenticated %}
             <li class="nav-item">
-              <a href="{% url "home" %}" class="nav-link">
+              <a href="{% url "admin_home" %}" class="nav-link">
                 <i class="nav-icon fas fa-home"></i>
                 <p>
                  Home
@@ -127,33 +127,25 @@
             </li>
             
             <li class="nav-item">
-              <a href="{% url "view_cart" %}" class="nav-link">
+              <a href="{% url "cartdash" %}" class="nav-link">
                 <i class="nav-icon fas fa-cart-plus "></i>
                 <p>
-                  Cart
-                  <i class=""></i>
-                </p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url "userBarcode" %}" class="nav-link">
-                <i class="nav-icon fas fa-barcode "></i>
-                <p>
-                  Scan Product
+                  Cart Logs
                   <i class=""></i>
                 </p>
               </a>
             </li>
 
             <li class="nav-item">
-              <a href="{% url "scanStore" %}" class="nav-link">
-                <i class="nav-icon fas fa-qrcode "></i>
+              <a href="{% url "barcode_scanner" %}" class="nav-link">
+                <i class="nav-icon fas fa-barcode "></i>
                 <p>
-                  Scan Store
+                  Add Products
                   <i class=""></i>
                 </p>
               </a>
             </li>
+
 
 
             <li class="nav-item">
