@@ -20,21 +20,19 @@ Scan Store
                     <div class="card-header">
                         <h3 class="card-title">Scan the Store's QR </h3>
                     </div>
-                    {% csrf_token %}
-                    <form id="scan-form" method="post" class="col-lg-12 pb-3">
+                   
+                    <form id="scan-form"  class="col-lg-12 pb-3">
 
                         <div class="form-group">
                             <label for="{{ form.name.id_for_label }}">Store name:</label>
-                            <div class="input-group">
-                                {{ form.name }}
-                            </div>
+                            <input type="text" id="store_name" class="form-control">
+                            <span id="msg" class="badge badge-success float-right"></span>
+                            <span id="msgs" class="badge badge-danger float-right"></span>
                         </div>
 
                         <div class="form-group">
                             <label for="{{ form.barcode.id_for_label }}">Store Qr:</label>
-                            <div class="input-group">
-                                {{ form.barcode }}
-                            </div>
+                            <input type="text" id="qr-input" class="form-control">
                             <div class="row col-md-12 pt-2">
 
                                 <div class="pr-1"><button id="start-scan-button">Start Scan</button></div>
@@ -57,7 +55,7 @@ Scan Store
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
             const scanArea = document.getElementById('scan-area');
-            const barcodeInput = document.getElementById('barcode-input');
+            const qr_input = document.getElementById('qr-input');
             const startScanButton = document.getElementById('start-scan-button');
 
             const stopScanButton = document.getElementById('stop-scan-button');
@@ -95,10 +93,10 @@ Scan Store
                 const imageData = ctx.getImageData(0, 0, width, height);
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
                 if (code) {
-                    console.log('Barcode value:', code.data);
-                    //  update barcode tag value
-                    barcodeInput.value = code.data;
-                    // barcodeTag.innerText = code.data;
+                    console.log('qr-input value:', code.data);
+                    //  update qr-input tag value
+                    qr_input.value = code.data;
+                    // qr-inputTag.innerText = code.data;
                     scanArea.style.display = 'none';
                     stopScan();
 
@@ -107,6 +105,74 @@ Scan Store
 
             startScanButton.addEventListener('click', startScan);
             stopScanButton.addEventListener('click', stopScan);
+
+            
+// Get the form element
+var form = document.getElementById("scan-form");
+
+// Get the success message element
+var successMessage = document.getElementById("msg");
+
+
+// Add an event listener to the form submit event
+form.addEventListener("submit", function(event) {
+  // Prevent the default form submission behavior
+  event.preventDefault();
+
+  // Get the value of the qrvalue input field
+  var qr_input = document.getElementById("qr-input").value;
+
+  // Get the CSRF token from the cookie
+  var csrftoken = getCookie('csrftoken');
+
+  // Set the CSRF token as a header in the AJAX request
+  $.ajaxSetup({
+    headers: {
+      'X-CSRFToken': csrftoken
+    }
+  });
+
+  // Send the qrvalue to the server using AJAX
+  $.ajax({
+    url: '{% url "start_session" %}',
+        method: 'POST',
+        data: {
+            'shop_id': qr_input,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                // Session started successfully
+                console.log('Session started successfully');
+      // Redirect to the next page
+                 window.location.href = "/user_barcode/";
+            } else {
+                // Session start failed
+                console.log('Session start failed: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error: ' + status + ' - ' + error);
+        }
+  });
+});
+// Function to retrieve a cookie by name
+function getCookie(name) {
+  var cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+            
 
 
         </script>

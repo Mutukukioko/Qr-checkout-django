@@ -1,4 +1,171 @@
+{% extends "user/base.html" %}
+{% block title %}
+Cart
+{% endblock %}
+{% block content %}
 
-{% for item_id, quantity in cart.items %}
-    <p>Item {{ item_id }} - Quantity: {{ quantity }}</p>
-{% endfor %}
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+       
+
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Recently Added Products</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+              
+              <ul class="products-list product-list-in-card pl-2 pr-2">
+                
+                
+                {% for cart_item in cart_items %}
+                    
+                  
+                <li class="item">
+                  
+                  <div class="product-img">
+                    <img src="media/img/jorgen-hendriksen-lX2YG5w4_gs-unsplash.jpg" alt="Product Image"
+                      class="img-size-50">
+                  </div>
+                  
+                  <div class="product-info">
+                    <a href="javascript:void(0)" class="product-title">{{ cart_item.product.name }}
+                      <span class="badge badge-warning float-right">Ksh {{ cart_item.product.price }}</span></a>
+                    <span class="product-description">
+                      500 grams
+
+                      <input type="text" class="d-sm-block float-right disabled 0" readonly="" value="{{ cart_item.quantity }}">
+
+                    </span>
+                    <div class="row">
+                      <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item" data-barcode-value="{{ item.0 }}" title="Remove item">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                  
+                </li>
+                {% if success_message %}
+    <div class="alert alert-success">{{ success_message }}</div>
+  
+  {% endif %}
+                {% endfor %}
+
+
+              </ul>
+            </div>
+            <!-- /.card-body -->
+
+            <!-- /.card-footer -->
+          </div>
+        </div>
+        <div class="col-md-5">
+          <!-- Form Element sizes -->
+          <div class="card card-success">
+            <div class="card-header">
+              <h3 class="card-title">Totals</h3>
+            </div>
+            <div class="card-body">
+              <!-- content ya card hapa -->
+              <div class="row">
+                <div class="col-4">Total Amount </div>
+                <div class="col-4">ksh 5000</div>
+              </div>
+              <button type="button" class="btn btn-block bg-gradient-success btn-flat" data-toggle="modal"
+                data-target="#modal-lg">Checkout</button>
+
+              </button>
+            </div>
+            <!-- /.card-body -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal fade" id="modal-lg">
+      <div class="modal-dialog modal-xs">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Payment Process</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <!-- the body should be precise -->
+            <div class="col-md-6">
+              <div class="card card-success">
+                <div class="card-header">
+                  <h3 class="card-title">Totals</h3>
+                </div>
+                <div class="card-body">
+                  <div class="form-group">
+                    <input type="number" class="form-control" id="m-pesa-number" placeholder="Enter your m-pesa number">
+                  </div>
+
+                  <div class="form-group">
+                    <input type="number" class="form-control" id="till" placeholder="Enter your stores till">
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn bg-gradient-success btn-md me-1 mb-2 align-items-center ">Pay</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+          </div>
+          
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+  </section>
+</div>
+<script>
+  const removeButtons = document.querySelectorAll(".remove-item");
+
+removeButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    const barcodeValue = event.target.getAttribute("data-barcode-value");
+
+    $.ajax({
+      type: "POST",
+      url: "/remove_item/",
+      data: {
+        barcode_value: barcodeValue,
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+      },
+      success: function () {
+        // Remove the item from the DOM
+        event.target.parentNode.remove();
+        
+        // Display a success message
+        const successMessage = document.getElementById("success-message");
+        successMessage.style.display = "block";
+        setTimeout(() => {
+          successMessage.style.display = "none";
+        }, 3000);
+      },
+      error: function () {
+        console.log("An error occurred");
+      },
+    });
+  });
+});
+
+</script>
+{% endblock %}

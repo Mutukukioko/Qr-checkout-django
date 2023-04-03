@@ -24,9 +24,13 @@ Cart
             </div>
             <!-- /.card-header -->
             <div class="card-body p-0">
+              
               <ul class="products-list product-list-in-card pl-2 pr-2">
                 
-                {% for item in cart_items %}
+                
+                {% for cart_item in cart_items %}
+                    
+                  
                 <li class="item">
                   
                   <div class="product-img">
@@ -35,12 +39,12 @@ Cart
                   </div>
                   
                   <div class="product-info">
-                    <a href="javascript:void(0)" class="product-title">{{ item.0}}
-                      <span class="badge badge-warning float-right">Ksh 1800</span></a>
+                    <a href="javascript:void(0)" class="product-title">{{ cart_item.product.name }}
+                      <span class="badge badge-warning float-right">Ksh {{ cart_item.product.price }}</span></a>
                     <span class="product-description">
                       500 grams
 
-                      <input type="text" class="d-sm-block float-right disabled 0" readonly="" value="{{ item.1.quantity }}">
+                      <input type="text" class="d-sm-block float-right disabled 0" readonly="" value="{{ cart_item.quantity }}">
 
                     </span>
                     <div class="row">
@@ -53,6 +57,7 @@ Cart
                 </li>
                 {% if success_message %}
     <div class="alert alert-success">{{ success_message }}</div>
+  
   {% endif %}
                 {% endfor %}
 

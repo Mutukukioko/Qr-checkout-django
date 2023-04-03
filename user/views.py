@@ -7,7 +7,7 @@ from django.shortcuts import HttpResponseRedirect
 from django.contrib import messages
 from .forms import CustomUserCreationForm, ItemForm
 from .models import *
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views import View
 from barcode.writer import ImageWriter
 from django.contrib.auth.decorators import login_required
@@ -106,16 +106,19 @@ def cartdash(request):
 
 @login_required(login_url='/signin')
 def add(request):
-    if request.method == 'POST':
-        form = Product(request.POST, request.FILES)
- 
-        if form.is_valid():
-            form.save()
-            return redirect('success')
-    else:
-        form = Product()
- 
-    return render(request, 'user/add.html',{'form': form,'title':'add'})
+    cart_items = []
+    cart = request.session.get('cart', {})
+    for product_id, item in cart.items():
+        product = Product.objects.get(id=product_id)
+        cart_item = {
+            'product': product,
+            'quantity': item['quantity']
+        }
+        cart_items.append(cart_item)
+
+        context = {'cart_items': cart_items}
+    
+    return render(request, 'user/add.html',context)
 
 class ScanView(View):
     template_name = 'user/barcode.html'
@@ -143,6 +146,8 @@ def shopProduct(request):
 
 @login_required(login_url='/signin')
 def userBarcode(request):
+    if not request.session.get('shop_scanned', False):
+        return redirect('scanStore')
     form = ItemForm()
     return render(request, 'user/user_barcode.html',{'form': form})
 
@@ -181,14 +186,17 @@ def add_cart (request, item_id):
 def view_cart(request):
     cart_items = []
     cart = request.session.get('cart', {})
-    for barcodevalue, item in cart.items():
+    for product_id, item in cart.items():
+        product = Product.objects.get(id=product_id)
         cart_item = {
-            'barcodevalue': barcodevalue,
+            'product': product,
             'quantity': item['quantity']
         }
         cart_items.append(cart_item)
-    # render the cart template with the cart items
-    return render(request, 'user/cart.html', {'cart': cart_items})
+
+        context = {'cart_items': cart_items}
+    
+    return render(request, 'user/cart.html',context)
          
   
 def store_cart(request):
@@ -228,3 +236,34 @@ def remove_item(request):
             messages.success(request, f' item removed!!')
     return redirect('view_cart')
 
+def start_session_view(request):
+    if request.method == 'POST':
+        shop_id = request.POST.get('shop_id')
+        # Query the database to check if the shop ID exists
+        try:
+            shop = Shop.objects.get(id=shop_id)
+        except Shop.DoesNotExist:
+            # Return an error message if the shop ID doesn't exist
+            return JsonResponse({'success': False, 'message': 'Invalid shop ID'})
+
+        # Set the shop ID in the session
+        request.session['shop_id'] = shop_id
+        request.session['shop_name'] = shop.shop_name
+        request.session['shop_image'] = str(shop.logo)
+
+        # Set the flag to indicate that the shop ID has been scanned
+        request.session['shop_scanned'] = True
+
+        return JsonResponse({'success': True, 'message': 'Shop scanned successfully'})
+
+    else:
+            return JsonResponse({'error': 'Invalid request method'})
+
+
+
+
+
+
+
+
+            
