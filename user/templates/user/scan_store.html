@@ -10,6 +10,8 @@ Scan Store
     <section class="content">
         <div class="container-fluid">
             <br>
+           
+<img id="{{ shop.logo.url }}" src="" alt="Shop Image">
             <br>
             <div class="row">
                 <div id="scan-area">
@@ -26,12 +28,12 @@ Scan Store
                         <div class="form-group">
                             <label for="{{ form.name.id_for_label }}">Store name:</label>
                             <input type="text" id="store_name" class="form-control">
-                            <span id="msg" class="badge badge-success float-right"></span>
-                            <span id="msgs" class="badge badge-danger float-right"></span>
+                            <span id="sucss" class="badge badge-success float-right"></span>
+                            <span id="error" class="badge badge-danger float-right"></span>
                         </div>
 
                         <div class="form-group">
-                            <label for="{{ form.barcode.id_for_label }}">Store Qr:</label>
+                            <label for="{{ form.barcode.id_for_label }}">Shops Qr:</label>
                             <input type="text" id="qr-input" class="form-control">
                             <div class="row col-md-12 pt-2">
 
@@ -111,7 +113,7 @@ Scan Store
 var form = document.getElementById("scan-form");
 
 // Get the success message element
-var successMessage = document.getElementById("msg");
+var successMessage = document.getElementById("sucss");
 
 
 // Add an event listener to the form submit event
@@ -141,7 +143,7 @@ form.addEventListener("submit", function(event) {
             'csrfmiddlewaretoken': '{{ csrf_token }}'
         },
         success: function(response) {
-            if (response.success) {
+            if ( response) {
                 // Session started successfully
                 console.log('Session started successfully');
       // Redirect to the next page
@@ -172,6 +174,50 @@ function getCookie(name) {
   }
   return cookieValue;
 }
+
+$(document).ready(function() {
+  // Add an event listener to the qr-input field
+  $('#qr-input').on('input', function() {
+    var qrInput = $(this).val();
+    $.ajax({
+      url: '/check_shop/',
+      data: {qr_input: qrInput},
+      success: function(data) {
+        if (data.exists) {
+          var inputElement = document.getElementById('store_name');
+          // Update the shop name and image on the page
+          // $('#shop-name').text(data.name);
+          inputElement.value = data.name;
+          $('#shop-image').attr('src', data.image);
+
+          // Set the text of the success span tag
+          $('#sucss').text(data.message);
+            // Hide the error span tag if it is visible
+            $('#error').hide();
+        } else {
+
+          // Clear the shop name and image on the page
+          var store_name = document.getElementById('store_name');
+          store_name.value ='';
+
+
+          var store_barcode = document.getElementById('qr-input');
+          store_barcode.value ='';
+          // $('#store_name').text('');
+          $('#shop-image').attr('src', '');
+
+          var store_barcode = document.getElementById('error');
+          store_barcode.value =data.message;
+
+          // $('#msgs').text(data.message);
+          console.log("error the san value is invalid")
+            // Hide the error span tag if it is visible
+            $('#sucss').hide();
+        }
+      }
+    });
+  });
+});
             
 
 

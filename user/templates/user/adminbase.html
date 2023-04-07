@@ -117,14 +117,34 @@
 
             </li>
             <li class="nav-item">
-              <a href="{% url "profile" %}" class="nav-link">
+              <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-user"></i>
                 <p>
-                  Profile
+                  Shops Profile
                   <i class=""></i>
                 </p>
               </a>
             </li>
+
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-qrcode"></i>
+                <p>
+                  Scan-qr
+                  <i class=""></i>
+                </p>
+              </a>
+            </li>
+ 
+            <li class="nav-item">
+              <a href="{% url "barcode_scanner" %}" class="nav-link">
+                <i class="nav-icon fas fa-barcode "></i>
+                <p>
+                  Add Products
+                  <i class=""></i>
+                </p>
+              </a>
+            </li>           
             
             <li class="nav-item">
               <a href="{% url "cartdash" %}" class="nav-link">
@@ -135,18 +155,6 @@
                 </p>
               </a>
             </li>
-
-            <li class="nav-item">
-              <a href="{% url "barcode_scanner" %}" class="nav-link">
-                <i class="nav-icon fas fa-barcode "></i>
-                <p>
-                  Add Products
-                  <i class=""></i>
-                </p>
-              </a>
-            </li>
-
-
 
             <li class="nav-item">
               <a href="{% url "logout" %}" class="nav-link">

@@ -5,146 +5,76 @@ Scanner
 {% endblock %}
 {% block content %}
 
-<div class="content-wrapper">
-  <!-- Content Header (Page header) -->
-  <section class="content-header">
-    <div class="container">
-      <h4 class="text-center text-dark">QC</h4>
-      <hr>
-      <div class="row">
-        <div class="col-md-6">
-          <video id="preview"></video>
-          <i class="fa fa-camera-retro" aria-hidden="true"></i>
-          <div class="col-md-6">
-            <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
-              <label class="btn btn-primary active">
-                <input type="radio" name="options" value="1" autocomplete="off" checked> Front Camera
-              </label>
-              <label class="btn btn-secondary">
-                <input type="radio" name="options" value="2" autocomplete="off"> Back Camera
-              </label>
-            </div>
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <!-- Small boxes (Stat box) -->
+    <div class="row">
+      <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-info">
+          <div class="inner">
+            <h3>150</h3>
+
+            <p>New Orders</p>
           </div>
+          <div class="icon">
+            <i class="ion ion-bag"></i>
+          </div>
+          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
-        <div class="col-md-6">
-
-          <form id="myForm">
-
-            <label>Item bar code Value</label>
-            <input type="text" value="" name="barcode" id="barcode" class="form-control" required>
-            <span id="msg"></span>
-
-            <div id="qr"></div>
-
-            <div class="pt-4"></div>
-            <div class="col-md-5">
-              <button type="submit" class="btn bg-indigo ">Add to cart</button>
-            </div>
-          </form>
-        </div>
-
-
       </div>
+      <!-- ./col -->
+      <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-success">
+          <div class="inner">
+            <h3>53<sup style="font-size: 20px">%</sup></h3>
 
-      <script type="text/javascript">
-        let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
-        scanner.addListener('scan', function (content) {
-          alert(content);
-          document.getElementById('barcode').value = content;
-          document.getElementById('barcode').innerHTML = content;
+            <p>Bounce Rate</p>
+          </div>
+          <div class="icon">
+            <i class="ion ion-stats-bars"></i>
+          </div>
+          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <!-- ./col -->
+      <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-warning">
+          <div class="inner">
+            <h3>44</h3>
 
-          
+            <p>User Registrations</p>
+          </div>
+          <div class="icon">
+            <i class="ion ion-person-add"></i>
+          </div>
+          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <!-- ./col -->
+      <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-danger">
+          <div class="inner">
+            <h3>65</h3>
 
-        });
-        Instascan.Camera.getCameras().then(function (cameras) {
-          if (cameras.length > 0) {
-            scanner.start(cameras[0]);
-            $('[name="options"]').on('change', function () {
-              if ($(this).val() == 1) {
-                if (cameras[0] != "") {
-                  scanner.start(cameras[0]);
-                } else {
-                  alert('No Front camera found!');
-                }
-              } else if ($(this).val() == 2) {
-                if (cameras[1] != "") {
-                  scanner.start(cameras[1]);
-                } else {
-                  alert('No Back camera found!');
-                }
-              }
-            });
-          } else {
-            console.error('No cameras found.');
-            alert('No cameras found.');
-          }
-        }).catch(function (e) {
-          console.error(e);
-          alert(e);
-        });
-
-        // Get the form element
-        var form = document.getElementById("myForm");
-
-        // Get the success message element
-        var successMessage = document.getElementById("success-message");
-
-        // Add an event listener to the form submit event
-        form.addEventListener("submit", function (event) {
-          // Prevent the default form submission behavior
-          event.preventDefault();
-
-          // Get the value of the barcode input field
-          var barcode = document.getElementById("barcode").value;
-
-          // Get the CSRF token from the cookie
-          var csrftoken = getCookie('csrftoken');
-
-          // Set the CSRF token as a header in the AJAX request
-          $.ajaxSetup({
-            headers: {
-              'X-CSRFToken': csrftoken
-            }
-          });
-
-          // Send the barcode to the server using AJAX
-          $.ajax({
-            url: "/store_cart/",
-            type: "POST",
-            data: { "barcode": barcode },
-            success: function (data) {
-              // Show success message
-              var successMsg = "Cart stored successfully!";
-              $("#msg").html(successMsg).show();
-
-              // Hide success message after 3 seconds
-              setTimeout(function () {
-                successMessage.style.display = "none";
-              }, 3000);
-            },
-            error: function () {
-              // Handle error
-            }
-          });
-        });
-
-        // Function to retrieve a cookie by name
-        function getCookie(name) {
-          var cookieValue = null;
-          if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-              var cookie = cookies[i].trim();
-              // Does this cookie string begin with the name we want?
-              if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-              }
-            }
-          }
-          return cookieValue;
-        }
-      </script>
+            <p>Unique Visitors</p>
+          </div>
+          <div class="icon">
+            <i class="ion ion-pie-graph"></i>
+          </div>
+          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <!-- ./col -->
     </div>
-  </section>
+    <!-- /.row -->
+    <!-- Main row -->
+    
+    <!-- /.row (main row) -->
+  </div><!-- /.container-fluid -->
+</section>
   {% endblock %}

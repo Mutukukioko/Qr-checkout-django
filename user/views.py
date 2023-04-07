@@ -5,8 +5,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.shortcuts import HttpResponseRedirect
 from django.contrib import messages
-from .forms import CustomUserCreationForm, ItemForm
+from .forms import *
 from .models import *
+import qrcode
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from barcode.writer import ImageWriter
@@ -18,18 +19,15 @@ def logout_view(request):
 
 def signup(request):
     # return render(request, 'user/signup.html')
-    if request.user.is_authenticated:
-        return redirect('signin')
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=password)
-            # login(request, user)
+            user = form.save(commit=False)
+            user.email = form.cleaned_data.get('email')
+            user.save()
+            messages.success(request, f'Account created for {user.username}!')
             return redirect('signin')
-        else:
+        else: 
             return render(request, 'user/signup.html', {'form': form})
     else:
         form = CustomUserCreationForm()
@@ -106,19 +104,24 @@ def cartdash(request):
 
 @login_required(login_url='/signin')
 def add(request):
-    cart_items = []
-    cart = request.session.get('cart', {})
-    for product_id, item in cart.items():
-        product = Product.objects.get(id=product_id)
-        cart_item = {
-            'product': product,
-            'quantity': item['quantity']
-        }
-        cart_items.append(cart_item)
+    if 'cart' in request.session:
+        cart = request.session['cart']
+        cart_items = []
+        
+        for product_id, item in cart.items():
+            product = Product.objects.get(id=product_id)
+            cart_item = {
+                'prod_id':product_id,
+                'product': product,
+                'quantity': item['quantity']
+            }
+            cart_items.append(cart_item)
 
         context = {'cart_items': cart_items}
+        return render(request,'user/add.html',context)
     
-    return render(request, 'user/add.html',context)
+    else:
+        return render(request,'user/add.html')
 
 class ScanView(View):
     template_name = 'user/barcode.html'
@@ -157,30 +160,6 @@ def paymentVal(request):
 def scanStore(request):
     form = ItemForm()
     return render(request, 'user/scan_store.html', {'form': form})
-
-
-@login_required(login_url='/signin')
-def add_cart (request, item_id):
-    if request.user.is_authenticated:
-        # retrieve the cart from the session or create a new one
-        cart = Cart.objects.filter(user=request.user)
-        cart = request.session.get('cart', {})
-        
-         # add the item to the cart or update the quantity if already in the cart
-        cart[item_id] = cart.get(item_id, 0) + 1
-        
-       
-  # save the updated cart to the session
-        request.session['cart'] = cart
-
-    # redirect to the cart page
-        return render(request, 'user/add.html', {'cart': cart})
-
-    else:
-        # handle the case where the user is not logged in
-        return render(request, 'user/home.html', {'cart': cart})
-   
-    
 
 @login_required(login_url='/signin')  
 def view_cart(request):
@@ -233,8 +212,15 @@ def remove_item(request):
         if barcode_value in request.session["cart"]:
             del request.session["cart"][barcode_value]
             request.session.modified = True
-            messages.success(request, f' item removed!!')
-    return redirect('view_cart')
+            response_data = {'status': 'success', 'message': 'Item removed!'}
+            return JsonResponse(response_data)
+
+        else:
+            response_data = {'status': 'error', 'message': 'Item not found!'}
+            return JsonResponse(response_data)
+
+    else:
+        return redirect('add')
 
 def start_session_view(request):
     if request.method == 'POST':
@@ -260,7 +246,90 @@ def start_session_view(request):
             return JsonResponse({'error': 'Invalid request method'})
 
 
+def check_shop(request):
+    qr_input = request.GET.get('qr_input')
+    if not qr_input or qr_input.strip() == '':
+        result = {'message': 'Please scan valid QR code'}
+    else:
+        try:
+            shop = Shop.objects.get(id=qr_input)
+            result = {
 
+                'success': True,
+                'message': 'Shop details retrieved successfully',
+                'exists': True,
+                'name': shop.shop_name,
+                'image': shop.logo.url,
+            }
+        except Shop.DoesNotExist:
+            result = {
+                'exists': False,
+                'message':'Invalid qr please scan again'
+            }
+    return JsonResponse(result)
+
+def check_prod(request):
+    qr_input = request.GET.get('qr_input')
+    if not qr_input or qr_input.strip() == '':
+        result = {'message': 'Please scan valid Barcode code'}
+    else:
+        try:
+            prod = Product.objects.get(id=qr_input)
+            result = {
+
+                'success': True,
+                'message': 'add to cart',
+                'exists': True,
+                'name': prod.name,
+            }
+        except Product.DoesNotExist:
+            result = {
+                'exists': False,
+                'message':'invalid barcode please scan again'
+                }
+    return JsonResponse(result)
+
+
+def add_shop(request):
+    if request.method == 'POST':
+        form = Shop_Form(request.POST, request.FILES)
+        if form.is_valid():
+            shop = form.save()
+            return HttpResponse(status = 200)
+            # redirect('shop_detail', shop.id)
+    else:
+        form = Shop_Form()
+    return render(request, 'user/addshop.html', {'form': form})
+        
+
+
+def shop_detail(request, shop_id):
+    # Retrieve the Shop object from the database using the shop_id parameter
+    shop = Shop.objects.get(id=shop_id)
+    return render(request, 'user/shop_detail.html', {'shop': shop})
+
+
+
+def generate_qrcode(request):
+    if request.method == 'POST':
+        data = request.POST.get('data')
+        img = qrcode.make(data)
+        img_path = 'media/qrcodes/' + data + '.png'
+        img.save(img_path)
+        context = {'qr_code_path': img_path}
+        return render(request, 'user/qrcode.html', context)
+    else:
+        return render(request, 'user/generate_qrcode.html')
+
+def shop_signout(request):
+    shop_name = request.session.get('shop_name')
+    if shop_name:
+        del request.session['shop_id']
+        del request.session['shop_name']
+        del request.session['shop_image']
+        return redirect('scanStore')
+        messages.success(request, f"You have successfully signed out of {shop_name}!")
+    
 
 
 

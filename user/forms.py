@@ -5,15 +5,18 @@ from .models import Product, Cart, CartItem, Shop, Item
 
 
 class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
     class Meta:
-        model=User
-        fields=['first_name','email','username','password1','password2']
+        model = User
+        fields = ['first_name', 'email', 'username','password1', 'password2']
         
-    def __init__(self,*args, **kwargs):
-        super(UserCreationForm,self).__init__(*args, **kwargs)
-        for name,field in self.fields.items():
-            field.widget.attrs.update({'class':'input'})
-
+    def __init__(self, *args, **kwargs):
+        super(CustomUserCreationForm, self).__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'input',
+            'placeholder': 'Username',
+            'style': 'background-image: url("/static/images/user-icon.png");'
+        })
 
 class Product_Form(forms.ModelForm):
     class Meta:

@@ -1,0 +1,11 @@
+{% extends 'user/adminbase.html' %}
+
+{% block content %}
+  <img src="{{ MEDIA_URL }}{{ qr_code_path }}" alt="QR code">
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    hideVideo();
+  </script>
+{% endblock %}

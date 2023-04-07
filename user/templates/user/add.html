@@ -9,7 +9,7 @@ Cart
   <section class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
-       
+
 
       </div>
     </div><!-- /.container-fluid -->
@@ -23,47 +23,62 @@ Cart
               <h3 class="card-title">Recently Added Products</h3>
             </div>
             <!-- /.card-header -->
+            {% if cart_items %}
             <div class="card-body p-0">
-              
+
               <ul class="products-list product-list-in-card pl-2 pr-2">
-                
-                
+
+
                 {% for cart_item in cart_items %}
-                    
-                  
+
+
                 <li class="item">
-                  
+
                   <div class="product-img">
                     <img src="media/img/jorgen-hendriksen-lX2YG5w4_gs-unsplash.jpg" alt="Product Image"
                       class="img-size-50">
                   </div>
-                  
+
                   <div class="product-info">
                     <a href="javascript:void(0)" class="product-title">{{ cart_item.product.name }}
                       <span class="badge badge-warning float-right">Ksh {{ cart_item.product.price }}</span></a>
                     <span class="product-description">
                       500 grams
 
-                      <input type="text" class="d-sm-block float-right disabled 0" readonly="" value="{{ cart_item.quantity }}">
 
-                    </span>
+                    </span> <br>
                     <div class="row">
-                      <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item" data-barcode-value="{{ item.0 }}" title="Remove item">
-                        <i class="fas fa-trash"></i>
-                      </button>
+                      <label class="product-description pr-3 float-left">Quantity :</label>
+                      <input type="text" name="quant[2]" class="disabled 0 float-right text-center rounded float-right "
+                        readonly value="{{ cart_item.quantity }}" size="1" min="1" max="100">
+
+
+
+                      <div class="input-group float-right">
+                        <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item"
+                          data-barcode-value="{{ cart_item.prod_id }}" title="Remove item">
+                          <i class="fas fa-trash"></i>
+                        </button>
+
+
+
+                      </div>
+
                     </div>
                   </div>
-                  
+
                 </li>
-                {% if success_message %}
-    <div class="alert alert-success">{{ success_message }}</div>
-  
-  {% endif %}
+                <div class="container"></div>
+
                 {% endfor %}
 
 
               </ul>
             </div>
+
+            {% else %}
+            <p>Your cart is empty.</p>
+            {% endif %}
             <!-- /.card-body -->
 
             <!-- /.card-footer -->
@@ -118,7 +133,8 @@ Cart
                     <input type="number" class="form-control" id="till" placeholder="Enter your stores till">
                   </div>
                   <div class="form-group">
-                    <button type="submit" class="btn bg-gradient-success btn-md me-1 mb-2 align-items-center ">Pay</button>
+                    <button type="submit"
+                      class="btn bg-gradient-success btn-md me-1 mb-2 align-items-center ">Pay</button>
                   </div>
                 </div>
               </div>
@@ -127,7 +143,7 @@ Cart
 
 
           </div>
-          
+
         </div>
         <!-- /.modal-content -->
       </div>
@@ -138,34 +154,40 @@ Cart
 <script>
   const removeButtons = document.querySelectorAll(".remove-item");
 
-removeButtons.forEach((button) => {
-  button.addEventListener("click", (event) => {
-    const barcodeValue = event.target.getAttribute("data-barcode-value");
+  removeButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      const barcodeValue = event.target.getAttribute("data-barcode-value");
+      console.log(barcodeValue)
 
-    $.ajax({
-      type: "POST",
-      url: "/remove_item/",
-      data: {
-        barcode_value: barcodeValue,
-        csrfmiddlewaretoken: "{{ csrf_token }}",
-      },
-      success: function () {
-        // Remove the item from the DOM
-        event.target.parentNode.remove();
-        
-        // Display a success message
-        const successMessage = document.getElementById("success-message");
-        successMessage.style.display = "block";
-        setTimeout(() => {
-          successMessage.style.display = "none";
-        }, 3000);
-      },
-      error: function () {
-        console.log("An error occurred");
-      },
+      $.ajax({
+        type: "POST",
+        url: "/remove_item/",
+        data: {
+          csrfmiddlewaretoken: "{{ csrf_token }}",
+          barcode_value: barcodeValue,
+
+        },
+        dataType: 'json',
+        success: function (response_data) {
+          if (response_data.status == 'success') {
+            var alert = $('<div class="alert alert-success">' + response_data.message + '</div>');
+            $('.container').prepend(alert);
+            setTimeout(function () {
+              alert.fadeOut(500, function () {
+                $(this).remove();
+              });
+            }, 3000);
+            location.reload(); // reload the page
+          } else {
+            // show the error message
+          }
+        },
+        error: function () {
+          console.log("An error occurred");
+        },
+      });
     });
   });
-});
 
 </script>
 {% endblock %}

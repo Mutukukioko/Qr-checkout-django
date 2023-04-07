@@ -73,7 +73,7 @@
                 <div class="card-body">
                   <form method="post" class="mx-1 mx-md-4">
                     {% csrf_token %}
-                    {% for field in form %}
+                    {% for field in form %} 
                     <p>
                       {{ field.label_tag }}<br>
 

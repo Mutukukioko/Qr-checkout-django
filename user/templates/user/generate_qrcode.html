@@ -1,0 +1,18 @@
+{% extends 'user/adminbase.html' %}
+
+{% block content %}
+  <form method="post" action="{% url 'generate_qrcode' %}">
+    {% csrf_token %}
+    <label for="data">Enter data to encode:</label>
+    <input type="text" id="data" name="data">
+    <button type="submit">Generate QR code</button>
+  </form>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    function hideVideo() {
+      document.getElementById('video').style.display = 'none';
+    }
+  </script>
+{% endblock %}

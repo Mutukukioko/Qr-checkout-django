@@ -1,0 +1,245 @@
+{% extends "user/base.html" %}
+{% load static %}
+{% block title %}
+Add Products
+{% endblock %}
+{% block content %}
+
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content">
+    <div class="container-fluid">
+      <br>
+      <br>
+      <div class="row">
+        <div id="scan-area">
+          <video id="video"></video>
+          <canvas id="canvas" style="display:none; "></canvas>
+        </div>
+        <div class="card card-primary ">
+          <div class="card-header">
+            <h3 class="card-title col-lg-12 pb-3">Add Shop</h3>
+          </div>
+         
+          <form  id="myForm" enctype="multipart/form-data">
+           
+            <div class="row pr-2">
+              <div class="form-group pl-3 ">
+                <label for="shop_name">Shop name:</label>
+                <div class="input-group">
+
+                  <input type="text" class="form-control" id="shop_name" name="shop_name" required>
+                </div>
+              </div>
+
+              <div class="form-group pl-3 pr-2">
+                <label for="location">Location:</label>
+                <div class="input-group">
+
+                  <input type="text" class="form-control" id="location" name="location" required>
+
+                </div>
+              </div>
+            </div>
+
+
+
+            <div class="row pr-2">
+              <div class="form-group pl-3">
+                <label for="qr">QR code:</label>
+                <div class="input-group">
+
+                  <input type="text" name="barcode" id="barcode-input" class="form-control" required>
+
+                </div>
+              </div>
+
+
+              <div class="form-group pl-3 pr-2">
+                <label for="email">Email:</label>
+                <div class="input-group">
+
+                  <input type="email" class="form-control" id="email" name="email" required>
+
+                </div>
+              </div>
+
+            </div>
+
+            <div class="form-group pl-3">
+              <label for="logo">Logo:</label>
+              <div class="input-group">
+
+                <input type="file" class="form-control-file" id="logo" name="logo" accept="image/*" required>
+
+              </div>
+            </div>
+
+            <div class="row pr-2">
+              <div class="form-group pl-3">
+                <label for="password">Password:</label>
+                <div class="input-group">
+
+                  <input type="password" class="form-control" id="password" name="password" required>
+
+                </div>
+              </div>
+
+              <!-- <div class="form-group pl-3 pr-2">
+                <label for="password">confirm Password:</label>
+                <div class="input-group">
+
+                  <input type="password" class="form-control" id="password2" name="password2" required>
+
+                </div>
+              </div> -->
+            </div>
+
+
+
+
+            <div class="form-group  pl-1">
+              <div class="row col-md-12 pt-2">
+                <button type="submit" class="btn btn-info pl-2">Submit</button>
+                <div class="pl-1"><button id="start-scan-button" class="btn btn-success">Start Scan</button></div>
+                <div class=" pl-1 pr-2"><button id="stop-scan-button" class="btn btn-warning">Stop Scan</button></div>
+              </div>
+              <span id="msg"></span>
+              <span id="msgs"></span>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+    <script>
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const scanArea = document.getElementById('scan-area');
+      const barcodeInput = document.getElementById('barcode-input');
+      const startScanButton = document.getElementById('start-scan-button');
+
+      const stopScanButton = document.getElementById('stop-scan-button');
+
+      let scanInterval;
+
+      const startScan = () => {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then((stream) => {
+            video.srcObject = stream;
+            video.play();
+            stopScanButton.style.display = 'block';
+            startScanButton.style.display = 'none';
+            scanInterval = setInterval(scan, 100);
+          })
+          .catch((error) => {
+            console.error('Unable to access the camera.', error);
+          });
+      };
+
+      const stopScan = () => {
+        clearInterval(scanInterval);
+        video.srcObject.getTracks().forEach(track => track.stop());
+        startScanButton.style.display = 'block';
+        scanArea.style.display = 'none';
+      };
+
+      const scan = () => {
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, width, height);
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if (code) {
+          console.log('Barcode value:', code.data);
+          //  update barcode tag value
+          barcodeInput.value = code.data;
+          // barcodeTag.innerText = code.data;
+          scanArea.style.display = 'none';
+          stopScan();
+
+        }
+      }
+
+      startScanButton.addEventListener('click', startScan);
+      stopScanButton.addEventListener('click', stopScan);
+
+// Get the form element
+var form = document.getElementById("myForm");
+
+// Get the success message element
+var successMessage = document.getElementById("msg");
+
+
+// Add an event listener to the form submit event
+form.addEventListener("submit", function(event) {
+  // Prevent the default form submission behavior
+  event.preventDefault();
+
+  // Get the value of the qrvalue input field
+  var barcode = barcodeInput;
+
+  // Get the CSRF token from the cookie
+  var csrftoken = getCookie('csrftoken');
+
+  // Set the CSRF token as a header in the AJAX request
+  $.ajaxSetup({
+    headers: {
+      'X-CSRFToken': csrftoken
+    }
+  });
+  var form = $('#myForm');
+  var formData = form.serialize();
+
+  // Send the qrvalue to the server using AJAX
+  $.ajax({
+    url: "/addshop/",
+    type: "POST",
+    data: formData,
+    success: function(data) {success-message
+      // Show success message
+      var successMsg = "Cart stored successfully!";
+      $("#msg").html(successMsg).show();
+
+      // Hide success message after 3 seconds
+      setTimeout(function() {
+        successMessage.style.display = "none";
+      }, 3000);
+    },
+    error: function() {
+      // Handle error
+      var successMsg = "Error";
+      $("#msgs").html(successMsg).show();
+    }
+  });
+});
+// Function to retrieve a cookie by name
+function getCookie(name) {
+  var cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+            
+
+
+    </script>
+
+</div>
+</section>
+
+
+{% endblock %}
