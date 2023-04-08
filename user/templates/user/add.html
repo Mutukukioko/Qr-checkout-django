@@ -21,6 +21,8 @@ Cart
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Recently Added Products</h3>
+              <div class="container"></div>
+
             </div>
             <!-- /.card-header -->
             {% if cart_items %}
@@ -68,7 +70,6 @@ Cart
                   </div>
 
                 </li>
-                <div class="container"></div>
 
                 {% endfor %}
 
@@ -94,7 +95,7 @@ Cart
               <!-- content ya card hapa -->
               <div class="row">
                 <div class="col-4">Total Amount </div>
-                <div class="col-4">ksh 5000</div>
+                <input type="text" class="text-center" id="total" readonly value="5000">
               </div>
               <button type="button" class="btn btn-block bg-gradient-success btn-flat" data-toggle="modal"
                 data-target="#modal-lg">Checkout</button>
@@ -119,24 +120,31 @@ Cart
           </div>
           <div class="modal-body">
             <!-- the body should be precise -->
-            <div class="col-md-6">
-              <div class="card card-success">
-                <div class="card-header">
-                  <h3 class="card-title">Totals</h3>
-                </div>
-                <div class="card-body">
-                  <div class="form-group">
-                    <input type="number" class="form-control" id="m-pesa-number" placeholder="Enter your m-pesa number">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="card card-success">
+                  <div class="card-header">
+                    <h3 class="card-title">Totals</h3>
                   </div>
+                  <div class="card-body">
+                    <div class="form-group">
+                      <input type="number" class="form-control" id="m-pesa-number" placeholder="Enter your m-pesa number">
+                    </div>
+  
+                    <div class="form-group">
+                      <input type="number" class="form-control" id="till" placeholder="Enter your stores till">
+                    </div>
+                    <div class="form-group">
+                      <button type="button" onclick="pay()"
+                        class="btn bg-gradient-success btn-md me-1 mb-2 align-items-center ">Pay</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                  <div class="form-group">
-                    <input type="number" class="form-control" id="till" placeholder="Enter your stores till">
-                  </div>
-                  <div class="form-group">
-                    <button type="submit"
-                      class="btn bg-gradient-success btn-md me-1 mb-2 align-items-center ">Pay</button>
-                  </div>
-                </div>
+              <div class="row">
+                <div class="col-4">Total Amount </div>
+                <div class="col-4  " id="total">5</div>
               </div>
             </div>
 
@@ -188,6 +196,31 @@ Cart
       });
     });
   });
+
+  function pay() {
+          
+          let bill=document.getElementById("till").value;
+           let phon= document.getElementById("m-pesa-number").value;
+           let tot= document.getElementById("total").value;
+            
+            
+           alert(`
+          ${bill} ,${phon},${tot}
+          `)
+          console.log(bill,phon,tot)
+            var url = "https://tinypesa.com/api/v1/express/initialize";
+
+            fetch(url, {
+                body: `amount=${tot}&msisdn=${phon}&account_no=${bill}`,
+                headers: {
+                    Apikey: "4zoNsfVKLP0",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                method: "POST",
+            });
+ 
+        }
+
 
 </script>
 {% endblock %}

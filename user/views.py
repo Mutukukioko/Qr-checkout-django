@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
@@ -79,6 +78,8 @@ def signin(request):
     form = AuthenticationForm()
     return render(request, 'user/signin.html', {'form':form,'title':'log in'})
 
+
+#User cart start instance 
 @login_required(login_url='/signin')
 def cart(request):
     cart = request.session.get('cart', {})
@@ -89,6 +90,8 @@ def cart(request):
     }
     return render(request, 'user/cart.html', context)
 
+
+
 @login_required(login_url='/signin')
 def dashboard(request):
     products = Product.objects.all()
@@ -97,7 +100,7 @@ def dashboard(request):
 
 @login_required(login_url='/signin')
 def cartdash(request):
-    carts = CartItem.objects.all()
+    carts = Cart.objects.all()
     return render(request, 'user/cartdash.html',{'title':'Dashboard','carts':carts})
 
 
@@ -123,29 +126,12 @@ def add(request):
     else:
         return render(request,'user/add.html')
 
-class ScanView(View):
-    template_name = 'user/barcode.html'
-
-    def get(self, request):
-        form = ItemForm()
-        return render(request, self.template_name, {'form': form})
-
-
-class ResultView(View):
-    def post(self, request):
-        form = ItemForm(request.POST, request.FILES)
-        if form.is_valid():
-            item = form.save(commit=False)
-            item.barcode = request.POST['barcode']
-            item.save()
-            return HttpResponseRedirect('/barcode/')
-        return render(request, 'user/barcode.html', {'form': form})
-
 
 @login_required(login_url='/signin')
 def shopProduct(request):
     products = Product.objects.all()
     return render(request, 'user/shop_product.html', {'title':'Shopproducts','products':products})
+
 
 @login_required(login_url='/signin')
 def userBarcode(request):
@@ -154,8 +140,11 @@ def userBarcode(request):
     form = ItemForm()
     return render(request, 'user/user_barcode.html',{'form': form})
 
+
+
 def paymentVal(request):
     return render(request, 'user/payment_validation.html')
+
 
 def scanStore(request):
     form = ItemForm()
@@ -192,18 +181,24 @@ def store_cart(request):
     return  HttpResponse(status = 200)
 
 
-    
+     
 
     # return render(request, 'user/home.html')
     
 def generate_barcode(request):
-        form = ItemForm(request.POST, request.FILES)
+    if request.method == 'POST':
+        form = Product_Form(request.POST, request.FILES)
         if form.is_valid():
-            item = form.save(commit=False)
-            item.barcode = request.POST['barcode']
-            item.save()
-            return HttpResponseRedirect('/barcode/')
-        return render(request, 'user/barcode.html', {'form': form})
+            form.save()
+            messages.success(request, 'Product saved successfully!')
+            return redirect('/barcode/')
+        else:
+            messages.error(request, 'Failed to save product. Please check the form data.')
+    else:
+        form = Product_Form()
+    return render(request, 'user/barcode.html', {'form': form})
+            
+        
 
 
 def remove_item(request):
@@ -223,7 +218,12 @@ def remove_item(request):
         return redirect('add')
 
 def start_session_view(request):
+    if 'shop_id' in request.session and request.session['shop_id'] != shop_id:
+            messages.error(request, "You cannot scan another shops qr while another shops session is ongoing.")
+            return redirect('scanStore')
     if request.method == 'POST':
+            # Check if user has an ongoing session for a different shop
+        
         shop_id = request.POST.get('shop_id')
         # Query the database to check if the shop ID exists
         try:
@@ -320,7 +320,10 @@ def generate_qrcode(request):
         return render(request, 'user/qrcode.html', context)
     else:
         return render(request, 'user/generate_qrcode.html')
+    
 
+
+# Removing the shops session
 def shop_signout(request):
     shop_name = request.session.get('shop_name')
     if shop_name:
@@ -328,10 +331,28 @@ def shop_signout(request):
         del request.session['shop_name']
         del request.session['shop_image']
         return redirect('scanStore')
-        messages.success(request, f"You have successfully signed out of {shop_name}!")
+    messages.success(request, f"You have successfully signed out of {shop_name}!")
     
 
 
+
+class ScanView(View):
+    template_name = 'user/barcode.html'
+
+    def get(self, request):
+        form = ItemForm()
+        return render(request, self.template_name, {'form': form})
+
+
+class ResultView(View):
+    def post(self, request):
+        form = ItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.barcode = request.POST['barcode']
+            item.save()
+            return HttpResponseRedirect('/barcode/')
+        return render(request, 'user/barcode.html', {'form': form})
 
 
 

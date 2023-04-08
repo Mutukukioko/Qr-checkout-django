@@ -165,6 +165,7 @@ form.addEventListener("submit", function(event) {
       $("#msg").html(successMsg).show();
     // handle success
     console.log('Cart stored successfully');
+    location.reload(); // reload the page
   },
   error: function(xhr, status, error) {
     // handle error
