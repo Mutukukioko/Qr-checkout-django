@@ -140,7 +140,7 @@
                 </p>
               </a>
             </li>
-
+            {% if 'shop_id' not in request.session %}
             <li class="nav-item">
               <a href="{% url "scanStore" %}" class="nav-link">
                 <i class="nav-icon fas fa-qrcode "></i>
@@ -150,6 +150,7 @@
                 </p>
               </a>
             </li>
+            {% endif %}
 
 
             <li class="nav-item">

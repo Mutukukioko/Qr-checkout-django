@@ -1,4 +1,6 @@
 {% extends "user/base.html" %}
+{% load static %}
+{% load custom_filters %}
 {% block title %}
 Cart
 {% endblock %}
@@ -32,20 +34,21 @@ Cart
 
 
                 {% for cart_item in cart_items %}
-
+                {{ cart_item }}
 
                 <li class="item">
 
                   <div class="product-img">
-                    <img src="media/img/jorgen-hendriksen-lX2YG5w4_gs-unsplash.jpg" alt="Product Image"
+                    <img src="{{ cart_item.product.picture.url }}" alt="Product Image"
                       class="img-size-50">
                   </div>
 
                   <div class="product-info">
                     <a href="javascript:void(0)" class="product-title">{{ cart_item.product.name }}
-                      <span class="badge badge-warning float-right">Ksh {{ cart_item.product.price }}</span></a>
+                      
+                      <span class="badge badge-warning float-right">Ksh{{ cart_item.product.price|floatformat:2|multiply:cart_item.quantity }}</span></a>
                     <span class="product-description">
-                      500 grams
+                      {{cart_item.product.description}}
 
 
                     </span> <br>
@@ -55,16 +58,34 @@ Cart
                         readonly value="{{ cart_item.quantity }}" size="1" min="1" max="100">
 
 
-
+                        {% if cart_item.barcodes|length > 1 %}
+                        <div class="input-group input-group-md mb-3">
+                          <div class="input-group-prepend">
+                            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+                              Choose prod barcode to remove
+                            </button>
+                            <ul class="dropdown-menu">
+                              {% for barcode in cart_item.barcodes %}
+                              <li> <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item"
+                                        data-product-id="{{ cart_item.product.name }}"
+                                        data-barcode-value="{{ barcode }}" title="Remove item">
+                                        {{ barcode }} 
+                                        <i class="fas fa-trash"></i>
+                                  </button>
+                              </li>
+                             {% endfor %}
+                            </ul>
+                          </div>
+                        </div>
+                        {% else %}
                       <div class="input-group float-right">
                         <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item"
-                          data-barcode-value="{{ cart_item.prod_id }}" title="Remove item">
+                          data-product-id="{{ cart_item.product.name }}"
+                          data-barcode-value="{{ cart_item.product.barcodes }}" title="Remove item">
                           <i class="fas fa-trash"></i>
                         </button>
-
-
-
                       </div>
+                      {% endif %}
 
                     </div>
                   </div>
@@ -97,9 +118,14 @@ Cart
                 <div class="col-4">Total Amount </div>
                 <input type="text" class="text-center" id="total" readonly value="5000">
               </div>
-              <button type="button" class="btn btn-block bg-gradient-success btn-flat" data-toggle="modal"
+
+
+              
+              <div class="button">
+                <button type="button" class="btn btn-block bg-gradient-success btn-flat" data-toggle="modal"
                 data-target="#modal-lg">Checkout</button>
 
+              </div>
               </button>
             </div>
             <!-- /.card-body -->
@@ -164,15 +190,17 @@ Cart
 
   removeButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
-      const barcodeValue = event.target.getAttribute("data-barcode-value");
-      console.log(barcodeValue)
+      const barcode = event.target.getAttribute("data-barcode-value");
+      const product_name = event.target.getAttribute("data-product-id");
+      console.log(barcode,product_name)
 
       $.ajax({
         type: "POST",
         url: "/remove_item/",
         data: {
           csrfmiddlewaretoken: "{{ csrf_token }}",
-          barcode_value: barcodeValue,
+          'product_name': product_name,
+          'barcode': barcode,
 
         },
         dataType: 'json',

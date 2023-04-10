@@ -10,8 +10,14 @@ Scan Store
     <section class="content">
         <div class="container-fluid">
             <br>
-           
-<img id="{{ shop.logo.url }}" src="" alt="Shop Image">
+            {% if 'shop_id' in request.session %}
+            
+                        <h1>Welcome to {{ shop_name }}</h1>
+                        <a href="{% url 'shop_signout' %}">Sign out</a>
+
+                    
+        {% endif %}
+        
             <br>
             <div class="row">
                 <div id="scan-area">

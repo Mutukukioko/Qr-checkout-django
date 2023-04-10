@@ -10,12 +10,20 @@ Scan Product
     <section class="content">
         <div class="container-fluid">
 <div class="container">
+  {% if 'shop_id' in request.session %}
+            
+                       
+                        <a href="{% url 'shop_signout' %}"><button >Signout of shop</button></a>
+
+                    
+        {% endif %}
   <div class="row">
     <div class="col-md-6 offset-md-3">
-      <div class="card mt-5">
+      <div class="card card-primary mt-5">
         <div class="card-header text-center">
          
-          <h3>Scan Barcode</h3>
+          <h4 class="float-left">Scan Barcode</h4> <img src="{{shop_image.url}}" alt="Product Image"
+          class="img-size-50 float-right">
         </div>
         <div class="card-body">
           <div id="reader"></div>
