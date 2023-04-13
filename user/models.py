@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+from django.utils import timezone
 
 
 
@@ -35,16 +36,16 @@ class Product(models.Model):
         return self.name
 
 class Cart(models.Model):
-    id =models.UUIDField(default = uuid.uuid4, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.CharField(max_length=254,default="")
-    quantity = models.IntegerField(default = 0)
-    completed = models.BooleanField(default = False)
-    
-    
-    def __str__(self):
-        return str(self.id)        
+    shop= models.ForeignKey(Shop, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    barcode = models.CharField(max_length=100, unique=True)
 
+# the unique_together constraint in the CartItem model ensures that 
+# each barcode can only be used once for each shop, which should prevent duplicate entries.
+    def __str__(self):
+        return self.name
 
 
     

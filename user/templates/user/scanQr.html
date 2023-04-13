@@ -1,0 +1,217 @@
+{% extends "user/adminbase.html" %}
+{% load static %}
+{% block title %}
+Scan Product
+{% endblock %}
+{% block content %}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content">
+        <div class="container-fluid">
+<div class="container">
+  {% if 'shop_id' in request.session %}
+            
+                       
+                        <a href="{% url 'shop_signout' %}"><button >Signout of shop</button></a>
+
+                    
+        {% endif %}
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <div class="card card-primary mt-5">
+        <div class="card-header text-center">
+         
+          <h4 class="float-left">Scan Qr</h4> <img src="{{shop_image.url}}" alt="Product Image"
+          class="img-size-50 float-right">
+        </div>
+        <div class="card-body">
+          <div id="reader"></div>
+          <form class="col-lg-12" id="myForm">
+          <div class="form-group">
+            <label for="name">Satus:</label>
+            <input type="text" class="form-control" id="name" name="name" readonly>
+            <span id="msg" class="badge badge-success float-right"></span>
+            <span id="msgs" class="badge badge-danger float-right"></span>
+          </div>
+          <div class="form-group">
+            <label for="name">Cart Qr value:</label>
+            <input type="text" class="form-control" id="barcode"  name="barcode" >
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-success" id="start-scan">Checkout</button>
+            
+          </div>
+          </form>
+          <div id="qr-reader" class="hidden"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+        </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+
+            // This method will trigger user permissions
+Html5Qrcode.getCameras().then(devices => {
+  /**
+   * devices would be an array of objects of type:
+   * { id: "id", label: "label" }
+   */
+  if (devices && devices.length) {
+    var cameraId = devices[0].id;
+    // .. use this to start scanning.
+  }
+}).catch(err => {
+  // handle err
+});
+function onScanSuccess(decodedText, decodedResult) {
+  // handle the scanned code as you like, for example:
+  console.log(`Code matched = ${decodedText}`, decodedResult);
+  var barcodeInput = document.getElementById("barcode");
+  // Update the barcode input field with the scanned value
+        barcodeInput.value = decodedText;
+        
+}
+
+function onScanFailure(error) {
+  // handle scan failure, usually better to ignore and keep scanning.
+  // for example:
+  console.warn(`Code scan error = ${error}`);
+}
+// Initialize the scanner object
+
+let html5QrcodeScanner = new Html5QrcodeScanner(
+  "reader",
+  { fps: 10, qrbox:  250 },
+  /* verbose= */ false);
+html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+ // Get the CSRF token from the cookie
+  var csrftoken = getCookie('csrftoken');
+
+  // Set the CSRF token as a header in the AJAX request
+  $.ajaxSetup({
+    headers: {
+      'X-CSRFToken': csrftoken
+    }
+  });
+
+
+$(document).ready(function() {
+  
+  // Add an event listener to the qr-input field
+  $('#barcode').on('input', function() {
+    var qrInput = $(this).val();
+    $.ajax({
+      url: '/check_prod/',
+      data: {qr_input: qrInput},
+      success: function(data) {
+        if (data.exists) {
+          var inputElement = document.getElementById('name');
+          // var succsess = document.getElementById('msg');
+          // Update the product name on the page
+         
+
+          inputElement.value = data.name;
+          // succsess.value = data.message;
+          console.log(data.name);
+          // Set the text of the success span tag
+          $('#msg').text(data.message);
+            // Hide the error span tag if it is visible
+            $('#msgs').hide();
+        } else {
+
+          // Clear the Products name on the page
+          $('#name').text('');
+          $('#msg').hide();
+          $('#msgs').text(data.message);
+            // Hide the error span tag if it is visible
+            
+        }
+      }
+    });
+  });
+});
+
+
+// Get the form element
+var form = document.getElementById("myForm");
+
+// Get the success message element
+var successMessage = document.getElementById("msg");
+
+
+
+// Add an event listener to the form submit event
+form.addEventListener("submit", function(event) {
+  // Prevent the default form submission behavior
+  event.preventDefault();
+
+  // Get the value of the qrvalue input field
+  var barcode = document.getElementById("barcode").value;
+
+  // Get the CSRF token from the cookie
+  var csrftoken = getCookie('csrftoken');
+
+  // Send the qrvalue to the server using AJAX
+  $.ajax({
+    url: "/store_cart/",
+    type: "POST",
+    data: {"barcode": barcode},
+    beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+    success: function(response) {
+
+      var successMsg = "Added to Cart successfully!";
+      $("#msg").html(successMsg).show();
+    // handle success
+    console.log('Cart stored successfully');
+    location.reload(); // reload the page
+  },
+  error: function(xhr, status, error) {
+    // handle error
+    console.error('Error storing cart:', error);
+  }
+  });
+});
+
+// Function to retrieve a cookie by name
+function getCookie(name) {
+  var cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+
+window.onload = function() {
+  // select all form elements and set their value to an empty string
+  var formElements = document.getElementsByTagName("input");
+  for (var i = 0; i < formElements.length; i++) {
+    formElements[i].value = "";
+  }
+};
+</script>
+</div>
+</section>
+
+
+{% endblock %}

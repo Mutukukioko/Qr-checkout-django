@@ -200,9 +200,9 @@ form.addEventListener("submit", function(event) {
     url: "/addshop/",
     type: "POST",
     data: formData,
-    success: function(data) {success-message
+    success: function(data) {
       // Show success message
-      var successMsg = "Cart stored successfully!";
+      var successMsg = data.message;
       $("#msg").html(successMsg).show();
 
       // Hide success message after 3 seconds
@@ -235,7 +235,13 @@ function getCookie(name) {
 }
             
 
-
+window.onload = function() {
+  // select all form elements and set their value to an empty string
+  var formElements = document.getElementsByTagName("input");
+  for (var i = 0; i < formElements.length; i++) {
+    formElements[i].value = "";
+  }
+};
     </script>
 
 </div>

@@ -38,25 +38,21 @@ Scanner
                     <th>Cart ID</th>
                     <th>Product ID</th>
                     <th>Quantity</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th>Date</th>
+                    <!-- <th>Action</th> -->
                   </tr>
                   {% for i in carts %}
                   <tr>
 
-                    <td>{{ i.cart_id}}</td>
+                    <td>{{ i.id}}</td>
                     <td>{{ i.product_id}}</td>
                     <td>{{ i.quantity }}</td>
                     <td>
-                      {% if i.completed %}
-                         <span class="badge badge-success">Completed</span>
-                      {% else %}
-                          <span class="badge badge-danger">Not completed</span>
-                      {% endif %}
+                      {{i.added_at}}
                     </td>
 
-                    <td>
-                      <div class="input-group input-group-md mb-3">
+                    <!-- <td>
+                      <div class="input-group input-group-sm mb-3">
                         <div class="input-group-prepend">
                           <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
                             Action
@@ -67,7 +63,7 @@ Scanner
                           </ul>
                         </div>
                       </div>
-                    </td>
+                    </td> -->
                   </tr>
                   {% endfor %}
 
@@ -78,8 +74,8 @@ Scanner
                     <th>Cart ID</th>
                     <th>Product ID</th>
                     <th>Quantity</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th>Date</th>
+                    <!-- <th>Action</th> -->
                   </tr>
                 </tfoot>
               </table>

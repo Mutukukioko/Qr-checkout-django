@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
@@ -6,7 +6,7 @@ from django.shortcuts import HttpResponseRedirect
 from django.contrib import messages
 from .forms import *
 from .models import *
-from itertools import groupby
+from django.db import transaction
 import qrcode
 from django.http import HttpResponse, JsonResponse
 from django.views import View
@@ -53,6 +53,28 @@ def profile(request):
     else:
         # If the user is not authenticated, redirect them to the login page
         return redirect('signin')
+
+
+@login_required(login_url='/signin')
+def update_profile(request):
+    user = request.user
+    if request.method == 'POST':
+            # Get the data from the AJAX request
+        first_name = request.POST.get('first_name')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+
+        # Get the current user
+        user = request.user
+
+        # Update the user's profile information
+        user.first_name = first_name
+        user.username = username
+        user.email = email
+        user.save()
+
+    # Return a success JSON response
+    return JsonResponse({'success': True})
 
 
 @login_required(login_url='/signin')
@@ -115,6 +137,9 @@ def shopProduct(request):
 
 
 
+def scanQr(request):
+    return render(request, 'user/scanQr.html')
+
 
 @login_required(login_url='/signin')
 def start_session_view(request):
@@ -174,15 +199,17 @@ def scanStore(request):
 def view_cart(request):
     cart_items = []
     cart = request.session.get('cart', {})
-    for product_id, item in cart.items():
-        product = Product.objects.get(id=product_id)
+    for product_name, item in cart.items():
+        product_dict = item['product']
+        product_dict['name'] = product_name
         cart_item = {
-            'product': product,
-            'quantity': item['quantity']
+            'product': product_dict,
+            'quantity': item['quantity'],
+            'total_price': item['quantity'] * product_dict['price'],
         }
         cart_items.append(cart_item)
 
-        context = {'cart_items': cart_items}
+    context = {'cart_items': cart_items}
 
     return render(request, 'user/cart.html', context)
 
@@ -200,13 +227,18 @@ def store_cart(request):
     # Get the cart from the session
     cart = request.session.get('cart', {})
 
+    # Check if the product is already in the cart
+    for cart_item in cart.values():
+            if barcode in cart_item['barcodes']:
+                return JsonResponse({'error': 'Product already in cart'})
+
     # Convert the product object to a dictionary
     product_dict = {'id': product.id, 'name': product.name, 'price': product.price, 'image': str(product.picture)}
 
     # Add the product to the cart or increase the quantity if it's already in the cart
     cart_item = cart.get(str(product.name))
     if cart_item is None:
-        cart[product.name] = {'product': product_dict, 'quantity': 1, 'barcodes': [barcode]}
+        cart[str(product.name)] = {'product': product_dict, 'quantity': 1, 'barcodes': [barcode]}
     else:
         cart_item['quantity'] += 1
         cart_item['barcodes'].append(barcode)
@@ -214,6 +246,7 @@ def store_cart(request):
     # Save the cart to the session
     request.session['cart'] = cart
     return JsonResponse({'success': True})
+
 
 
 @login_required(login_url='/signin')
@@ -236,6 +269,45 @@ def add(request):
     else:
         return render(request, 'user/add.html')
 
+@login_required(login_url='/signin')
+@transaction.atomic
+def save_cart(request):
+    if request.method == 'POST':
+        # Loop through each item in the cart
+        all_saved = True
+        cart = request.session['cart']
+        # Create a list of products to save
+        products_to_save = []
+        for cart_item in cart.values():
+            for barcode in cart_item['barcodes']:
+                product_dict = {'id': cart_item['product']['id'], 'name': cart_item['product']['name'], 
+                                'price': cart_item['product']['price'], 'image': cart_item['product']['image'], 
+                                'barcode': barcode}
+                products_to_save.append(product_dict)
+
+        # Save the products to the database
+        for product_dict in products_to_save:
+            product_id = product_dict['id']
+            
+            product = get_object_or_404(Product, id=product_id)
+            cart_item = Cart(user=request.user, shop=product.shop, product_id=product.id, barcode=product_dict['barcode'])
+            cart_item.save()
+            all_saved=True
+
+        # Clear the cart
+        if all_saved ==True:
+            request.session['cart'] = {}
+            messages.success(request, 'Cart cleared.')
+            return redirect('home')
+        else:
+            messages.warning(request, 'Cart not cleared.')
+            return redirect('home')
+
+    else:
+        return redirect('add')
+    
+
+
 
 
 def generate_barcode(request):
@@ -255,44 +327,36 @@ def generate_barcode(request):
 
 @login_required(login_url='/signin')
 def remove_item(request):
-    if request.method == 'POST':
-        # Get the product ID and barcode from the POST request
-        product_name = request.POST.get('product_name')
-        barcode = request.POST.get('barcode')
+    # Get the product ID and barcode from the POST request
+    product_name = request.POST.get('product_name')
+    barcode = request.POST.get('barcode')
 
-        # Get the cart from the session
-        cart = request.session.get('cart', {})
+    # Get the cart from the session
+    cart = request.session.get('cart', {})
 
-        # Get the cart item to remove
-        cart_item = cart.get(str(product_name))
-        if cart_item is None:
-            return JsonResponse({'error': 'Cart item not found'})
+    # Get the cart item for the product
+    cart_item = cart.get(str(product_name))
 
-        # Remove the barcode from the list of barcodes
+    # Check if the cart item exists
+    if cart_item is None:
+        return JsonResponse({'error': 'Product not found in cart'})
+
+    # Check if the barcode is in the list of barcodes for the cart item
+    if barcode not in cart_item['barcodes']:
+        return JsonResponse({'error': 'Barcode not found in cart item'})
+
+    # If there is only one barcode for the cart item, remove the entire item from the cart
+    if len(cart_item['barcodes']) == 1:
+        del cart[str(product_name)]
+    else:
         cart_item['barcodes'].remove(barcode)
+        # Otherwise, reduce the quantity by one
+        cart_item['quantity'] -= 1
 
-        # If there are no more barcodes for this item, remove the cart item entirely
-        if len(cart_item['barcodes']) == 0:
-            del cart[product_name]
-        else:
-            # Otherwise, reduce the quantity by one
-            cart_item['quantity'] -= 1
+    # Save the updated cart to the session
+    request.session['cart'] = cart
 
-    # Save the cart to the session
-
-            # Save the cart to the session
-            request.session['cart'] = cart
-            response_data={
-                'success': True,
-                'message': 'Successfully removed product',
-                }
-
-            # Return a success response
-            return JsonResponse(response_data)
-
-    # Return an error response if the request is not a POST request or if the cart item does not exist
-    response_data = {'error': 'Cart item not found'}
-    return JsonResponse(response_data)
+    return JsonResponse({'success': True,'message':'success removed cart'})
 
 
 
@@ -365,7 +429,11 @@ def add_shop(request):
         form = Shop_Form(request.POST, request.FILES)
         if form.is_valid():
             shop = form.save()
-            return HttpResponse(status=200)
+            data = {
+                'status':200,
+                'message':'Shop addedd successfully '
+            }
+        return HttpResponse(data)
             # redirect('shop_detail', shop.id)
     else:
         form = Shop_Form()
@@ -407,6 +475,37 @@ def shop_detail(request, shop_id):
     # Retrieve the Shop object from the database using the shop_id parameter
     shop = Shop.objects.get(id=shop_id)
     return render(request, 'user/shop_detail.html', {'shop': shop})
+
+
+
+
+
+#user dashboard
+def inventory(request):
+    return render(request, 'user/userInventory.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class ScanView(View):
     template_name = 'user/barcode.html'

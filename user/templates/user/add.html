@@ -81,7 +81,8 @@ Cart
                       <div class="input-group float-right">
                         <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item"
                           data-product-id="{{ cart_item.product.name }}"
-                          data-barcode-value="{{ cart_item.product.barcodes }}" title="Remove item">
+                          data-barcode-value="{{ cart_item.barcodes }}" title="Remove item">
+                          {{ cart_item.barcodes.0 }}
                           <i class="fas fa-trash"></i>
                         </button>
                       </div>
@@ -120,7 +121,12 @@ Cart
               </div>
 
 
-              
+              <br>
+              <form method="POST" action="{% url 'save_cart' %}">
+                {% csrf_token %}
+                <button type="submit">Save Cart</button>
+              </form>
+<br>              
               <div class="button">
                 <button type="button" class="btn btn-block bg-gradient-success btn-flat" data-toggle="modal"
                 data-target="#modal-lg">Checkout</button>
@@ -204,20 +210,17 @@ Cart
 
         },
         dataType: 'json',
-        success: function (response_data) {
-          if (response_data.status == 'success') {
-            var alert = $('<div class="alert alert-success">' + response_data.message + '</div>');
-            $('.container').prepend(alert);
-            setTimeout(function () {
-              alert.fadeOut(500, function () {
-                $(this).remove();
-              });
-            }, 3000);
+        
+    success: function(response) {
+      if (response.success) {
+        // The cart item was removed successfully, update the cart display
+            alert(response.message);
             location.reload(); // reload the page
-          } else {
-            // show the error message
-          }
-        },
+      } else {
+        // There was an error removing the cart item, display the error message
+        alert(response.error);
+      }
+    },
         error: function () {
           console.log("An error occurred");
         },

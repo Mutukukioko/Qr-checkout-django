@@ -114,7 +114,16 @@ Scan Store
             startScanButton.addEventListener('click', startScan);
             stopScanButton.addEventListener('click', stopScan);
 
-            
+  // Get the CSRF token from the cookie
+  var csrftoken = getCookie('csrftoken');
+
+  // Set the CSRF token as a header in the AJAX request
+  $.ajaxSetup({
+    headers: {
+      'X-CSRFToken': csrftoken
+    }
+  });
+          
 // Get the form element
 var form = document.getElementById("scan-form");
 
@@ -130,16 +139,7 @@ form.addEventListener("submit", function(event) {
   // Get the value of the qrvalue input field
   var qr_input = document.getElementById("qr-input").value;
 
-  // Get the CSRF token from the cookie
-  var csrftoken = getCookie('csrftoken');
-
-  // Set the CSRF token as a header in the AJAX request
-  $.ajaxSetup({
-    headers: {
-      'X-CSRFToken': csrftoken
-    }
-  });
-
+  
   // Send the qrvalue to the server using AJAX
   $.ajax({
     url: '{% url "start_session" %}',
@@ -227,6 +227,13 @@ $(document).ready(function() {
             
 
 
+window.onload = function() {
+  // select all form elements and set their value to an empty string
+  var formElements = document.getElementsByTagName("input");
+  for (var i = 0; i < formElements.length; i++) {
+    formElements[i].value = "";
+  }
+};
         </script>
 
 </div>
