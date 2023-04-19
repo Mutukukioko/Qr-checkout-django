@@ -79,6 +79,35 @@ function onScanSuccess(decodedText, decodedResult) {
   var barcodeInput = document.getElementById("barcode");
   // Update the barcode input field with the scanned value
         barcodeInput.value = decodedText;
+        $.ajax({
+      url: '/check_prod/',
+      data: {qr_input: barcodeInput.value},
+      success: function(data) {
+        if (data.exists) {
+          var inputElement = document.getElementById('name');
+          // var succsess = document.getElementById('msg');
+          // Update the product name on the page
+         
+
+          inputElement.value = data.name;
+          // succsess.value = data.message;
+          console.log(data.name);
+          // Set the text of the success span tag
+          $('#msg').text(data.message);
+            // Hide the error span tag if it is visible
+            $('#msgs').hide();
+        } else {
+
+          // Clear the Products name on the page
+          $('#name').text('');
+          $('#msg').hide();
+          $('#msgs').text(data.message);
+            // Hide the error span tag if it is visible
+            
+        }
+      }
+    });
+  
         
 }
 
@@ -106,41 +135,13 @@ html5QrcodeScanner.render(onScanSuccess, onScanFailure);
   });
 
 
-$(document).ready(function() {
+// $(document).ready(function() {
   
   // Add an event listener to the qr-input field
-  $('#barcode').on('input', function() {
-    var qrInput = $(this).val();
-    $.ajax({
-      url: '/check_prod/',
-      data: {qr_input: qrInput},
-      success: function(data) {
-        if (data.exists) {
-          var inputElement = document.getElementById('name');
-          // var succsess = document.getElementById('msg');
-          // Update the product name on the page
-         
-
-          inputElement.value = data.name;
-          // succsess.value = data.message;
-          console.log(data.name);
-          // Set the text of the success span tag
-          $('#msg').text(data.message);
-            // Hide the error span tag if it is visible
-            $('#msgs').hide();
-        } else {
-
-          // Clear the Products name on the page
-          $('#name').text('');
-          $('#msg').hide();
-          $('#msgs').text(data.message);
-            // Hide the error span tag if it is visible
-            
-        }
-      }
-    });
-  });
-});
+//   $('#barcode').on('input', function() {
+//     var qrInput = $(this).val();
+//    });
+// });
 
 
 // Get the form element

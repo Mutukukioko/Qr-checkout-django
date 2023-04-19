@@ -1,4 +1,5 @@
 import io
+import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
@@ -243,21 +244,21 @@ def generate_barcode(request):
 @login_required(login_url='/signin')
 @user_passes_test(lambda u: not u.is_superuser, login_url='/signin')
 def start_session_view(request):
-    if 'shop_id' in request.session and request.session['shop_id'] != shop_id:
-        messages.error(
-            request, "You cannot scan another shops qr while another shops session is ongoing.")
-        return redirect('scanStore')
     if request.method == 'POST':
-        shop_id = request.POST.get('shop_id')
+        shop_name = request.POST.get('shop_name')
         # Query the database to check if the shop ID exists
         try:
-            shop = Shop.objects.get(user_id=shop_id)
+            shop = Shop.objects.get(name=shop_name)
         except Shop.DoesNotExist:
             # Return an error message if the shop ID doesn't exist
             return JsonResponse({'success': False, 'message': 'Invalid shop ID'})
 
+        if 'shop_name' in request.session and request.session['shop_name'] != shop_name:
+            messages.error( request, "You cannot scan another shop's QR while another shop's session is ongoing.")
+            return redirect('scanStore')
+        
         # Set the shop ID in the session
-        request.session['shop_id'] = shop_id
+        request.session['shop_id'] = shop.user.id
         request.session['shop_name'] = shop.name
         request.session['shop_image'] = str(shop.image)
 
@@ -409,7 +410,7 @@ def save_cart(request):
             # Generate QR code and save as Base64 string in the database
             qr_data = f"{cartId} successful"
             qr_code = qrcode.make(qr_data)
-            qr_filename = f"{uuid.uuid4()}.png"
+            qr_filename = f"{cartId()}.png"
             qr_path = os.path.join('qr_codes', qr_filename)
             qr_code.save(qr_path)
 
@@ -471,26 +472,45 @@ def remove_item(request):
 # Check shop if exists in the database
 @login_required(login_url='/signin')
 def check_shop(request):
-    qr_input = request.GET.get('qr_input')
-    if not qr_input or qr_input.strip() == '':
-        result = {'message': 'Please scan valid QR code'}
-    else:
-        try:
-            shop = Shop.objects.get(user_id=qr_input)
-            result = {
+    if request.method == 'GET':
+        posted_value = request.GET.get('qr_input')
+        if not posted_value or posted_value.strip() == '':
+            result = {'message': 'Please scan valid QR code'}
+        else:
+            try:
+                # Retrieve all qr codes from the database
+                shops = Shop.objects.all()
 
-                'success': True,
-                'message': 'Shop details retrieved successfully',
-                'exists': True,
-                'name': shop.name,
-                'image': shop.image.url,
-            }
-        except Shop.DoesNotExist:
-            result = {
-                'exists': False,
-                'message': 'Invalid qr please scan again'
-            }
+                # Compare posted value with truncated values from database
+                for shop in shops:
+                    full_name = shop.name
+                    if posted_value.replace("-", "") == full_name:
+
+                        result = {
+                            'success': True,
+                            'message': 'Shop details retrieved successfully',
+                            'exists': True,
+                            'name': shop.name,
+                            'image': shop.image.url,
+                            # Add other attributes here as needed
+                        }
+                        break  # Exit the loop if a match is found
+
+                else:
+                    result = {
+                        'success': False,
+                        'message': 'Shop details not found',
+                        'exists': False,
+                    }
+            except Shop.DoesNotExist:
+                result = {
+                    'exists': False,
+                    'message': 'Invalid QR code, please scan again'
+                }
+
     return JsonResponse(result)
+
+            
 
 
 # Compare the barcode input values if they match with existing values in the database

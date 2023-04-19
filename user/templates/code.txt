@@ -221,4 +221,48 @@ grouped_cart_list = list(grouped_cart_items.values())
          return render(request, 'user/addshop.html', {'form': form})
 
 
-     
+     =============================================
+
+
+
+
+
+     posted_value = request.GET.get('qr_input')
+    if not posted_value or posted_value.strip() == '':
+        result = {'message': 'Please scan valid QR code'}
+    else:
+        posted_value = posted_value.replace("-", " ")
+        if "  " in posted_value:
+            posted_value = posted_value.replace("  ", " ")
+        truncated_posted_value = posted_value.title()
+        try:
+            # Retrieve all qr codes from the database
+            shops = Shop.objects.all()
+
+            # Compare posted value with truncated values from database
+            for shop in shops:
+                full_name = shop.qrcode.name.split("/")[-1].split(".")[0]
+                truncated_name = full_name.split("_")[0].replace("-", " ").title() + " - " + full_name.split("_")[1].replace("-", " ").title()
+                if truncated_posted_value == truncated_name.replace("  ", " "):
+                    result = {
+                        'success': True,
+                        'message': 'Shop details retrieved successfully',
+                        'exists': True,
+                        'name': shop.name,
+                        'image': shop.image.url,
+                        # Add other attributes here as needed
+                    }
+                    break  # Exit the loop if a match is found
+
+                else:
+                    result = {
+                        'success': False,
+                        'message': 'Shop details not found',
+                        'exists': False,
+                    }
+        except Shop.DoesNotExist:
+            result = {
+                'exists': False,
+                'message': 'Invalid qr please scan again'
+            }
+    return JsonResponse(result)

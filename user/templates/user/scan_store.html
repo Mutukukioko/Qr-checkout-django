@@ -1,3 +1,4 @@
+
 {% extends "user/base.html" %}
 {% load static %}
 {% block title %}
@@ -6,235 +7,242 @@ Scan Store
 {% block content %}
 
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content">
-        <div class="container-fluid">
-            <br>
-            {% if 'shop_id' in request.session %}
-            
-                        <h1>Welcome to {{ shop_name }}</h1>
-                        <a href="{% url 'shop_signout' %}">Sign out</a>
+  <!-- Content Header (Page header) -->
+  <section class="content">
+    <div class="container-fluid">
+      <br>
+      {% if 'shop_id' in request.session %}
 
-                    
-        {% endif %}
-        
-            <br>
-            <div class="row">
-                <div id="scan-area">
-                    <video id="video"></video>
-                    <canvas id="canvas" style="display:none;"></canvas>
-                </div>
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">Scan the Store's QR </h3>
-                    </div>
-                   
-                    <form id="scan-form"  class="col-lg-12 pb-3">
+      <h1>Welcome to {{ shop_name }}</h1>
+      <a href="{% url 'shop_signout' %}">Sign out</a>
 
-                        <div class="form-group">
-                            <label for="{{ form.name.id_for_label }}">Store name:</label>
-                            <input type="text" id="store_name" class="form-control">
-                            <span id="sucss" class="badge badge-success float-right"></span>
-                            <span id="error" class="badge badge-danger float-right"></span>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="{{ form.barcode.id_for_label }}">Shops Qr:</label>
-                            <input type="text" id="qr-input" class="form-control">
-                            <div class="row col-md-12 pt-2">
+      {% endif %}
 
-                                <div class="pr-1"><button id="start-scan-button">Start Scan</button></div>
-                                <div class=" pr-2"><button id="stop-scan-button" >Stop Scan</button></div>
-                            </div>
-                        </div>
-
-                        <div class="center">
-
-                        <button type="submit" class="btn btn-info pr-4 pl-4">Submit</button>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-         
+      <br>
+      <div class="row">
+        <div id="scan-area">
+          <video id="video"></video>
+          <canvas id="canvas" style="display:none;"></canvas>
         </div>
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Scan the Store's QR </h3>
+          </div>
 
-        <script>
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            const scanArea = document.getElementById('scan-area');
-            const qr_input = document.getElementById('qr-input');
-            const startScanButton = document.getElementById('start-scan-button');
+          <form id="scan-form" class="col-lg-12 pb-3">
 
-            const stopScanButton = document.getElementById('stop-scan-button');
+            <div class="form-group">
+              <label for="{{ form.name.id_for_label }}">Store name:</label>
+              <input type="text" id="store_name" class="form-control">
+              <span id="sucss" class="badge badge-success float-right"></span>
+              <span id="error" class="badge badge-danger float-right"></span>
+            </div>
 
-            let scanInterval;
+            <div class="form-group">
+              <label for="{{ form.barcode.id_for_label }}">Shops Qr:</label>
+              <input type="text" id="qr-input" class="form-control">
+              <div class="row col-md-12 pt-2">
 
-            const startScan = () => {
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-                    .then((stream) => {
-                        video.srcObject = stream;
-                        video.play();
-                        stopScanButton.style.display = 'block';
-                        startScanButton.style.display = 'none';
-                        scanInterval = setInterval(scan, 100);
-                    })
-                    .catch((error) => {
-                        console.error('Unable to access the camera.', error);
-                    });
-            };
+                <div class="pr-1"><button type="button" id="start-scan-button">Start Scan</button></div>
+                <div class=" pr-2"><button type="" id="stop-scan-button">Stop Scan</button></div>
+              </div>
+              
+            </div>
 
-            const stopScan = () => {
-                clearInterval(scanInterval);
-                video.srcObject.getTracks().forEach(track => track.stop());
-                startScanButton.style.display = 'block';
-                scanArea.style.display = 'none';
-            };
+            <div class="center pt-3">
 
-            const scan = () => {
-                const width = video.videoWidth;
-                const height = video.videoHeight;
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0, width, height);
-                const imageData = ctx.getImageData(0, 0, width, height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height);
-                if (code) {
-                    console.log('qr-input value:', code.data);
-                    //  update qr-input tag value
-                    qr_input.value = code.data;
-                    // qr-inputTag.innerText = code.data;
-                    scanArea.style.display = 'none';
-                    stopScan();
+              <button type="submit" class="btn btn-info pr-4 pl-4">Submit</button>
+            </div>
 
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const scanArea = document.getElementById('scan-area');
+      const qr_input = document.getElementById('qr-input');
+      const startScanButton = document.getElementById('start-scan-button');
+
+      const stopScanButton = document.getElementById('stop-scan-button');
+
+      let scanInterval;
+
+      const startScan = () => {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then((stream) => {
+            video.srcObject = stream;
+            video.play();
+            stopScanButton.style.display = 'block';
+            startScanButton.style.display = 'none';
+            scanInterval = setInterval(scan, 100);
+          })
+          .catch((error) => {
+            console.error('Unable to access the camera.', error);
+          });
+      };
+
+      const stopScan = () => {
+        clearInterval(scanInterval);
+        video.srcObject.getTracks().forEach(track => track.stop());
+        startScanButton.style.display = 'block';
+        scanArea.style.display = 'none';
+      };
+
+      const scan = () => {
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, width, height);
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if (code) {
+          console.log('qr-input value:', code.data);
+          //  update qr-input tag value
+          qr_input.value = code.data;
+
+        
+          // qr-inputTag.innerText = code.data;
+          scanArea.style.display = 'none';
+          stopScan();
+          $.ajax({
+              url: '/check_shop/',
+              method: 'GET',
+              data: { 'qr_input': code.data,'csrfmiddlewaretoken': '{{ csrf_token }}' },
+              dataType: 'json',
+              success: function (result) {
+                if (result.success) {
+                  var inputElement = document.getElementById('store_name');
+                  // Update the shop name and image on the page
+                  // $('#shop-name').text(data.name);
+                  inputElement.value = result.name;
+                  $('#shop-image').attr('src', result.image);
+                  console.log(result.name)
+                  // Set the text of the success span tag
+                  $('#sucss').text(result.message);
+                  // Hide the error span tag if it is visible
+                  $('#error').hide();
+                } else {
+
+                  
+                  // Clear the shop name and image on the page
+                  var store_name = document.getElementById('store_name');
+                  store_name.value = '';
+
+
+                  var store_barcode = document.getElementById('qr-input');
+                  store_barcode.value = '';
+                  // $('#store_name').text('');
+                  $('#shop-image').attr('src', '');
+
+                  var store_barcode = document.getElementById('error');
+                  store_barcode.value = result.message;
+
+                  // $('#msgs').text(data.message);
+                  console.log("error the scanned value is invalid",result.message)
+                  // Hide the error span tag if it is visible
+                  $('#sucss').hide();
+                  alert(result.message)
                 }
-            }
+              }
+            });
+         
+        }
+      }
 
-            startScanButton.addEventListener('click', startScan);
-            stopScanButton.addEventListener('click', stopScan);
+      startScanButton.addEventListener('click', startScan);
+      stopScanButton.addEventListener('click', stopScan);
 
-  // Get the CSRF token from the cookie
-  var csrftoken = getCookie('csrftoken');
+      // Get the CSRF token from the cookie
+      var csrftoken = getCookie('csrftoken');
 
-  // Set the CSRF token as a header in the AJAX request
-  $.ajaxSetup({
-    headers: {
-      'X-CSRFToken': csrftoken
-    }
-  });
-          
-// Get the form element
-var form = document.getElementById("scan-form");
+      // Set the CSRF token as a header in the AJAX request
+      $.ajaxSetup({
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      });
 
-// Get the success message element
-var successMessage = document.getElementById("sucss");
+      // Get the form element
+      var form = document.getElementById("scan-form");
+
+      // Get the success message element
+      var successMessage = document.getElementById("sucss");
 
 
-// Add an event listener to the form submit event
-form.addEventListener("submit", function(event) {
-  // Prevent the default form submission behavior
-  event.preventDefault();
+      // Add an event listener to the form submit event
+      form.addEventListener("submit", function (event) {
+        // Prevent the default form submission behavior
+        event.preventDefault();
 
-  // Get the value of the qrvalue input field
-  var qr_input = document.getElementById("qr-input").value;
+        // Get the value of the qrvalue input field
+        var qr_input = document.getElementById("store_name").value;
 
-  
-  // Send the qrvalue to the server using AJAX
-  $.ajax({
-    url: '{% url "start_session" %}',
-        method: 'POST',
-        data: {
-            'shop_id': qr_input,
+
+        // Send the qrvalue to the server using AJAX
+        $.ajax({
+          url: '{% url "start_session" %}',
+          method: 'POST',
+          data: {
+            'shop_name': qr_input !== '' ? qr_input : null,
             'csrfmiddlewaretoken': '{{ csrf_token }}'
-        },
-        success: function(response) {
-            if ( response) {
-                // Session started successfully
-                console.log('Session started successfully');
-      // Redirect to the next page
-                 window.location.href = "/user_barcode/";
+          },
+          success: function (response) {
+            if (response) {
+              // Session started successfully
+              console.log('Session started successfully');
+              // Redirect to the next page
+              window.location.href = "/user_barcode/";
             } else {
-                // Session start failed
-                console.log('Session start failed: ' + response.message);
+              // Session start failed
+              console.log('Session start failed: ' + response.message);
             }
-        },
-        error: function(xhr, status, error) {
+          },
+          error: function (xhr, status, error) {
             console.error('AJAX error: ' + status + ' - ' + error);
+          }
+        });
+      });
+      // Function to retrieve a cookie by name
+      function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
         }
-  });
-});
-// Function to retrieve a cookie by name
-function getCookie(name) {
-  var cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    var cookies = document.cookie.split(';');
-    for (var i = 0; i < cookies.length; i++) {
-      var cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
+        return cookieValue;
       }
-    }
-  }
-  return cookieValue;
-}
 
-$(document).ready(function() {
-  // Add an event listener to the qr-input field
-  $('#qr-input').on('input', function() {
-    var qrInput = $(this).val();
-    $.ajax({
-      url: '/check_shop/',
-      data: {qr_input: qrInput},
-      success: function(data) {
-        if (data.exists) {
-          var inputElement = document.getElementById('store_name');
-          // Update the shop name and image on the page
-          // $('#shop-name').text(data.name);
-          inputElement.value = data.name;
-          $('#shop-image').attr('src', data.image);
-
-          // Set the text of the success span tag
-          $('#sucss').text(data.message);
-            // Hide the error span tag if it is visible
-            $('#error').hide();
-        } else {
-
-          // Clear the shop name and image on the page
-          var store_name = document.getElementById('store_name');
-          store_name.value ='';
+      // $(document).ready(function() {
+      // Add an event listener to the qr-input field
+      //  $('#qr-input').on('input', function () {
+        // var qrInput = code.data;
+            // });
+      // });
 
 
-          var store_barcode = document.getElementById('qr-input');
-          store_barcode.value ='';
-          // $('#store_name').text('');
-          $('#shop-image').attr('src', '');
 
-          var store_barcode = document.getElementById('error');
-          store_barcode.value =data.message;
-
-          // $('#msgs').text(data.message);
-          console.log("error the san value is invalid")
-            // Hide the error span tag if it is visible
-            $('#sucss').hide();
+      window.onload = function () {
+        // select all form elements and set their value to an empty string
+        var formElements = document.getElementsByTagName("input");
+        for (var i = 0; i < formElements.length; i++) {
+          formElements[i].value = "";
         }
-      }
-    });
-  });
-});
-            
-
-
-window.onload = function() {
-  // select all form elements and set their value to an empty string
-  var formElements = document.getElementsByTagName("input");
-  for (var i = 0; i < formElements.length; i++) {
-    formElements[i].value = "";
-  }
-};
-        </script>
+      };
+    </script>
 
 </div>
 </section>
