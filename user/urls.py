@@ -12,6 +12,7 @@ path('home2/',views.admin_home, name="admin_home"),
 path('dashboard/', views.dashboard, name='dashboard'),
 path('cartdash/', views.cartdash, name = 'cartdash'),
 path('scanQr/', views.scanQr, name='scanQr'),
+path('shop_profile/',views.shop_profile, name='shop_profile'),
 #add shop product
 path('barcode/', views.generate_barcode, name='barcode_scanner'),
 path('shop_product/', views.shopProduct, name='shopProduct'),

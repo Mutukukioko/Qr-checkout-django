@@ -6,16 +6,17 @@ from django.utils import timezone
 
 
 
+
 class Shop(models.Model):
-    shop_name = models.CharField(max_length = 200)
-    location = models.CharField(max_length = 200)
-    logo = models.ImageField(upload_to="img", default="")
-    qrval = models.CharField(max_length=254, unique=True, default="")
-    email = models.EmailField(max_length = 254)
-    password = models.CharField(max_length = 254)
+    name = models.CharField(max_length=50,default='user')
+    user = models.OneToOneField(User, on_delete=models.CASCADE,default="user")
+    location = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='shop_images/', default="")
+    qrcode = models.ImageField(upload_to='shop_qrcodes/', default="")
+    
 
     def __str__(self):
-        return self.shop_name
+        return self.name
 
 class Product(models.Model):
     CATEGORY = (
@@ -25,11 +26,11 @@ class Product(models.Model):
     )
     name = models.CharField(max_length=50)
     price = models.IntegerField()
-    shop = models.ForeignKey(Shop, on_delete = models.CASCADE)
-    category = models.CharField(max_length = 254, null=True, choices= CATEGORY)
-    brand = models.CharField(max_length = 254)
+    user = models.ForeignKey(User, on_delete = models.CASCADE, default="")
+    category = models.CharField(max_length=254, null=True, choices=CATEGORY)
+    brand = models.CharField(max_length=254)
     barcode = models.CharField(max_length=100, unique=True, default=False)
-    description = models.CharField(max_length = 254)
+    description = models.CharField(max_length=254)
     picture = models.ImageField(upload_to="prodimg", default="")
 
     def __str__(self):
@@ -37,10 +38,12 @@ class Product(models.Model):
 
 class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    cart_id = models.UUIDField(default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    shop= models.ForeignKey(Shop, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     barcode = models.CharField(max_length=100, unique=True)
+    qr_code = models.ImageField(upload_to='qr_codes', blank=True, null=True)
+    added_at =models.DateTimeField(default=timezone.now)
 
 # the unique_together constraint in the CartItem model ensures that 
 # each barcode can only be used once for each shop, which should prevent duplicate entries.

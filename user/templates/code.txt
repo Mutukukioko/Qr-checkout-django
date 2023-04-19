@@ -145,3 +145,80 @@ grouped_cart_list = list(grouped_cart_items.values())
 
 
               </ul>
+
+              # get the number of times each unique cart id appears for a specific user
+    cart_counts = Cart.objects.filter(user=request.user).values('cart_id').annotate(count=Count('cart_id'))
+
+    for cart in cart_counts:
+    #  print(f'Cart ID: {cart["cart_id"]} - Count: {cart["count"]}')/
+     count_id = {
+         'Cart ID': cart["cart_id"] ,
+         'Count': cart["count"]
+     }
+
+     login_required
+     def create_shop(request):
+         if request.method == 'POST':
+             # create the user account for the shop owner
+             username = request.POST['username']
+             email = request.POST['email']
+             password = request.POST['password']
+             
+             # check if the username and email are unique
+             if User.objects.filter(username=username).exists():
+                 messages.error(request, 'Username already taken')
+                 return redirect('create_shop')
+             if User.objects.filter(email=email).exists():
+                 messages.error(request, 'Email already taken')
+                 return redirect('create_shop')
+             
+             user = User.objects.create_user(username=username, email=email, password=password)
+     
+             # create the shop object
+             name = request.POST['name']
+             location = request.POST['location']
+             image = request.FILES['image']
+             shop = Shop.objects.create(name=name, location=location, owner=user, image=image)
+     
+             # generate the QR code
+             qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
+             qr.add_data(f"{name} - {location}")
+             qr.make(fit=True)
+             img = qr.make_image(fill_color="black", back_color="white")
+     
+             # save the QR code image to the shop object
+             buffer = BytesIO()
+             img.save(buffer, format='PNG')
+             image_file = ContentFile(buffer.getvalue())
+             filename = f"{name.replace(' ', '_')}_{location.replace(' ', '_')}.png"
+             file_path = f"shop_qrcodes/{filename}"
+             default_storage.save(file_path, image_file)
+             shop.qr_code.save(filename, image_file)
+     
+             # log in the shop owner and redirect to the shop dashboard
+             user = authenticate(username=username, password=password)
+             if user is not None:
+                 login(request, user)
+                 return redirect('shop_dashboard')
+             else:
+                 messages.error(request, 'Invalid username or password')
+                 return redirect('login')
+         else:
+             return render(request, 'create_shop.html')
+======================================================================
+ if request.method == 'POST':
+             form = Shop_Form(request.POST, request.FILES)
+             if form.is_valid():
+                 shop = form.save()
+                 data = {
+                     'status':200,
+                     'message':'Shop addedd successfully '
+                 }
+             return HttpResponse(data)
+                 # redirect('shop_detail', shop.id)
+         else:
+             form = Shop_Form()
+         return render(request, 'user/addshop.html', {'form': form})
+
+
+     

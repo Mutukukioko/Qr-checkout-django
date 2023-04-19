@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+
     'user',
 ]
 
@@ -77,7 +79,7 @@ WSGI_APPLICATION = 'store.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Shopcheck',
+        'NAME': 'Qrcheck',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '127.0.0.1',
@@ -136,7 +138,10 @@ EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST="smtp.gmail.com"
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+MESSAGE_STORAGE_OPTIONS = {
+    'cookie_expires': 86400,  # 1 day in seconds
+}
 
 
 # Default primary key field type
