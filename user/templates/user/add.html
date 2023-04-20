@@ -78,14 +78,15 @@ Cart
                           </div>
                         </div>
                         {% else %}
-                      <div class="input-group float-right">
+                        {% for barcode in cart_item.barcodes %}
                         <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item"
-                          data-product-id="{{ cart_item.product.name }}"
-                          data-barcode-value="{{ cart_item.barcodes }}" title="Remove item">
-                          {{ cart_item.barcodes.0 }}
-                          <i class="fas fa-trash"></i>
-                        </button>
-                      </div>
+                                   >
+                                  
+                                  <i class="fas fa-trash"data-product-id="{{ cart_item.product.name }}"
+                                  data-barcode-value="{{ barcode }}" title="Remove item"></i>
+                            </button>
+                        
+                       {% endfor %}
                       {% endif %}
 
                     </div>

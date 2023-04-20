@@ -170,7 +170,7 @@ def shop_profile(request):
         # If the user is authenticated, show their details
         username = request.user.username
         email = request.user.email
-        shop=Shop.objects.get(user_id=request.user.id)
+        shop=Shop.objects.get(user_id=request.user)
         data = {
             'username': username,
             'email': email,
@@ -408,9 +408,9 @@ def save_cart(request):
                              product_id=product.id, barcode=product_dict['barcode'])
 
             # Generate QR code and save as Base64 string in the database
-            qr_data = f"{cartId} successful"
+            qr_data = f"{cartId} paid"
             qr_code = qrcode.make(qr_data)
-            qr_filename = f"{cartId()}.png"
+            qr_filename = f"{cartId}.png"
             qr_path = os.path.join('qr_codes', qr_filename)
             qr_code.save(qr_path)
 

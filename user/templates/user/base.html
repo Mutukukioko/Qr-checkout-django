@@ -26,8 +26,8 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/turtlejs/0.9.1/turtle.min.js"></script>
 
 
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-<script src="{% static 'node_modules/html5-qrcode/html5-qrcode.min.js' %}"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="{% static 'node_modules/html5-qrcode/html5-qrcode.min.js' %}"></script>
 
   <title>
     {% block title %}
@@ -55,7 +55,7 @@
 
 
 
-    
+
     <nav class="navbar navbar-expand navbar-primary navbar-dark ">
       <!-- Left navbar links -->
       <ul class="navbar-nav">
@@ -69,20 +69,20 @@
       <ul class="navbar-nav ml-auto">
 
 
-        
-       
-        
+
+
+
         {% if 'shop_id' in request.session %}
         <li class="nav-item">
           <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
             <span class="brand-text font-weight-light">
-            
-               {{ shop_name }}   
+
+              {{ shop_name }}
             </span>
             <i class="nav-icon fas fa-bars "></i>
           </a>
         </li>
-                        
+
         {% endif %}
         <!-- Messages Dropdown Menu -->
         <li class="nav-item dropdown">
@@ -138,7 +138,17 @@
             <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
           </div>
         </li>
- 
+        <!-- Cart -->
+        {% if user.is_authenticated %}
+        <li class="nav-item ">
+          <a class="nav-link"  href="{% url "add" %}">
+            <i class="nav-icon fas fa-cart-plus"></i>
+            <span class="badge badge-warning navbar-badge">15</span>
+          </a>
+        </li>
+        {% endif %}
+
+
       </ul>
     </nav>
 
@@ -148,36 +158,34 @@
         <img src="" alt="" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">Qr System</span>
       </a>
-      
-  
+      {% if user.is_authenticated %}
+
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- Sidebar user (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-          
-       
-          <div class="info">
-            {% if user.is_authenticated %}
-            <a href="#" class="d-block">{{username}}</a>
-            {% endif %}
+          <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+
+          <div>
+            <span class="font-weight-bold " style="color: aliceblue;">{{user.username}}</span>
           </div>
         </div>
 
-        
+
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            {% if user.is_authenticated %}
+
             <li class="nav-item">
               <a href="{% url "home" %}" class="nav-link">
                 <i class="nav-icon fas fa-home"></i>
                 <p>
-                 Home
+                  Home
                   <i class=""></i>
                 </p>
               </a>
-              
+
 
             </li>
             <li class="nav-item">
@@ -189,13 +197,13 @@
                 </p>
               </a>
             </li>
-            
+
             <li class="nav-item">
               <a href="{% url "add" %}" class="nav-link">
                 <i class="nav-icon fas fa-cart-plus "></i>
                 <p>
                   Cart
-                  <i class=""></i>
+                  <span class="badge badge-info right">0</span>
                 </p>
               </a>
             </li>
@@ -230,7 +238,7 @@
                 </p>
               </a>
             </li>
-          {% else %}
+            {% else %}
             <li class="nav-item">
               <a href="{% url "signin" %}" class="nav-link">
                 <i class="nav-icon fas fa-sign-in-alt"></i>

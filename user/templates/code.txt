@@ -1,4 +1,3 @@
-#below are some codes I have tested through have been helpful but found something better
 from itertools import groupby
 
 def get_cart(request):
@@ -267,3 +266,5 @@ grouped_cart_list = list(grouped_cart_items.values())
                 'message': 'Invalid qr please scan again'
             }
     return JsonResponse(result)
+
+
