@@ -23,7 +23,8 @@ Profile
                         <div class="col-md-3 border-right">
                             <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img
                                     class="rounded-circle mt-5" width="150px"
-                                    src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"><span
+                                    src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+                                    <span
                                     class="font-weight-bold">{{first_name}}</span><span
                                     class="text-black-50">{{email}}</span><span>
                                 </span>
@@ -72,7 +73,7 @@ Profile
                             <div class="card card-primary card-outline">
                                 <div class="card-body box-profile">
                                     <form id="myForm">
-                                        
+
                                         <div class="text-center">
                                             <img class="profile-user-img img-fluid img-circle" src=""
                                                 alt="User profile picture">
@@ -81,16 +82,16 @@ Profile
 
                                         <ul class="list-group list-group-unbordered mb-3">
                                             <li class="list-group-item">
-                                                <b>Name</b> <input type="text" id="first_name" class="form-control float-right"
-                                                    value="{{first_name}}">
+                                                <b>Name</b> <input type="text" id="first_name"
+                                                    class="form-control float-right" value="{{first_name}}">
                                             </li>
                                             <li class="list-group-item">
-                                                <b>Username </b> <input type="text" id="username" class="form-control float-right"
-                                                    value="{{username}}">
+                                                <b>Username </b> <input type="text" id="username"
+                                                    class="form-control float-right" value="{{username}}">
                                             </li>
                                             <li class="list-group-item">
-                                                <b>Email</b> <input type="text" id="email" class="form-control float-right"
-                                                    value="{{email}}">
+                                                <b>Email</b> <input type="text" id="email"
+                                                    class="form-control float-right" value="{{email}}">
                                             </li>
                                         </ul>
 
@@ -109,7 +110,7 @@ Profile
 
                     </div>
                     <!-- /.modal-content -->
-                </div> 
+                </div>
                 <!-- /.modal-dialog -->
             </div>
         </div>
@@ -120,8 +121,8 @@ Profile
 {% endif %}
 
 <script>
-    $(document).ready(function() {
-        $('#myForm').submit(function(event) {
+    $(document).ready(function () {
+        $('#myForm').submit(function (event) {
             event.preventDefault(); // prevent default form submission
 
             // Get the form data
@@ -130,18 +131,18 @@ Profile
                 'username': $('#username').val(),
                 'email': $('#email').val()
             };
-             // Get the CSRF token from the cookie
-  var csrftoken = getCookie('csrftoken');
+            // Get the CSRF token from the cookie
+            var csrftoken = getCookie('csrftoken');
             // Send the AJAX request
             $.ajax({
                 url: '/update_profile/',
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
-                beforeSend: function(xhr, settings) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         // Success message
                         alert('Profile updated successfully!');
@@ -151,7 +152,7 @@ Profile
                         alert('Error updating profile.');
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     // Error message
                     alert('Error updating profile.');
                 }
@@ -160,21 +161,21 @@ Profile
     });
 
     // Function to retrieve a cookie by name
-function getCookie(name) {
-  var cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    var cookies = document.cookie.split(';');
-    for (var i = 0; i < cookies.length; i++) {
-      var cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
-  }
-  return cookieValue;
-}
 </script>
 
 {% endblock %}
