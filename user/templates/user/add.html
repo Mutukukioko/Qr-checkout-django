@@ -20,9 +20,9 @@ Cart
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Recently Added Products</h3>
+          <div class="card card-teal">
+            <div class="card-header " style="justify-content: center;">
+              <h3 class="card-title text-bold">Recently Added Products</h3>
               <div class="container"></div>
 
             </div>
@@ -34,7 +34,7 @@ Cart
 
 
                 {% for cart_item in cart_items %}
-                {{ cart_item }}
+
 
                 <li class="item">
 
@@ -101,24 +101,28 @@ Cart
             </div>
 
             {% else %}
-            <p>Your cart is empty.</p>
+            <div class="text-center">
+              <img src="{% static 'img/no_cart.png' %}" class="img-fluid" alt="No Cart Items">
+              <h5 class="mt-3">Cart is empty</h5>
+              <p class="text-muted">Add some items to your cart and start shopping.</p>
+            </div>
             {% endif %}
             <!-- /.card-body -->
-
+<div class="card-footer card-teal bg-gradient-teal " style="inline-size:auto;"></div>
             <!-- /.card-footer -->
           </div>
         </div>
         <div class="col-md-5">
           <!-- Form Element sizes -->
-          <div class="card card-success">
-            <div class="card-header">
-              <h3 class="card-title">Totals</h3>
+          <div class="card card-teal text-center">
+            <div class="card-header text-center" style="justify-content: center; display: flex;">
+              <h3 class="card-title text-bold">Total Billing</h3>
             </div>
             <div class="card-body">
               <!-- content ya card hapa -->
               <div class="row">
                 <div class="col-4">Total Amount </div>
-                <input type="text" class="text-center" id="total" readonly value="5000">
+                <input type="text" class="text-center form-control" id="total" readonly value="5000">
               </div>
 
 
@@ -129,8 +133,8 @@ Cart
               </form>
 <br>              
               <div class="button">
-                <button type="button" class="btn btn-block bg-gradient-success btn-flat" data-toggle="modal"
-                data-target="#modal-lg">Checkout</button>
+                <button type="button" class="btn btn-block bg-gradient-teal btn-flat text-bold" data-toggle="modal"
+                data-target="#modal-lg" style="font-family: 'Times New Roman', Times, serif;">Checkout</button>
 
               </div>
               </button>
@@ -144,9 +148,9 @@ Cart
 
     <div class="modal fade" id="modal-lg">
       <div class="modal-dialog modal-xs">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Payment Process</h4>
+        <div class="modal-content"  >
+          <div class="modal-header bg-teal" style="display: flex; justify-content: center;" >
+            <h4 class="modal-title text-bold" style="font-family: 'Times New Roman', Times, serif;">Payment Process</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -155,9 +159,9 @@ Cart
             <!-- the body should be precise -->
             <div class="row">
               <div class="col-md-8">
-                <div class="card card-success">
-                  <div class="card-header">
-                    <h3 class="card-title">Totals</h3>
+                <div class="card card-teal">
+                  <div class="card-header" style="display: flex; justify-content: center; ">
+                    <h3 class="card-title text-bold">Totals</h3>
                   </div>
                   <div class="card-body">
                     <div class="form-group">
@@ -167,9 +171,9 @@ Cart
                     <div class="form-group">
                       <input type="number" class="form-control" id="till" placeholder="Enter your stores till">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="display: flex; justify-content: center;">
                       <button type="button" onclick="pay()"
-                        class="btn bg-gradient-success btn-md me-1 mb-2 align-items-center ">Pay</button>
+                        class="btn bg-gradient-teal   align-items-center text-bold">Pay</button>
                     </div>
                   </div>
                 </div>

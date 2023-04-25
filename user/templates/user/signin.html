@@ -9,17 +9,17 @@ Login
   <section class="content">
     <div class="container-fluid">
       <div class="page-header min-vh-75">
-        <div class="container">
+        <div class="container" style="display: flex; justify-content: center;">
           <br>
-          <div class="row">
-            <div class="col-xl-4 col-lg-5 col-md-6 d-flex flex-column mx-auto">
+          <div class="row" >
+            <div class="col-xl-4   d-flex flex-column mx-auto">
               <div class="card card-plain mt-8">
-                <div class="card-header pb-0 text-left bg-transparent">
-                  <h3 class="font-weight-bolder text-info text-gradient">Welcome back</h3>
+                <div class="card-header pb-0 text-left bg-teal">
+                  <h3 class="font-weight-bolder text-White text-gradient">Welcome back</h3>
                   <p class="mb-0">Enter Credentials to sign in</p>
                 </div>
-                <div class="card-body">
-                  <form method="post">
+                <div class="card-body container-fluid">
+                  <form method="post" class="form-group">
                     {% csrf_token %}
                     {% for field in form %}
                     <p>
@@ -32,10 +32,10 @@ Login
                     {% endfor %}
                     </p>
                     {% endfor %}
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" class="btn btn-light bg-gradient-teal">Login</button>
                   </form>
                 </div>
-                <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                <div class="card-footer text-center pt-0 px-lg-2 px-1 bg-gradient-teal">
                   <p class="mb-4 text-sm mx-auto">
                     Don't have an account?
                     <a href="{% url 'signup' %}" class="text-info text-gradient font-weight-bold">Sign up</a>

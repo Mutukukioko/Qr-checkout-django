@@ -5,16 +5,16 @@ Dashboard
 {% endblock %}
 {% block content %}
 <br>
-<br>
+
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <!-- Main content -->
     <section class="content">
-        
+        <br>
         <div class="container-fluid">
             <!-- Small boxes (Stat box) -->
             <div class="row">
-                <div class="col-lg-3 col-6">
+                <div class="col-md-4">
                     <!-- small box -->
                     <div class="small-box bg-info">
                         <div class="inner">
@@ -29,7 +29,7 @@ Dashboard
                     </div>
                 </div>
                 <!-- ./col -->
-                <div class="col-lg-3 col-6">
+                <div class="col-md-4">
                     <!-- small box -->
                     <div class="small-box bg-success">
                         <div class="inner">
@@ -38,13 +38,13 @@ Dashboard
                             <p>Cart Logs</p>
                         </div>
                         <div class="icon">
-                            <i class="icon fas fa-cart-plus "></i>
+                            <i class="infor-icon fas fa-cart-plus "></i>
                         </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a href="{% url "cartdash" %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 <!-- ./col -->
-                <div class="col-lg-3 col-7">
+                <div class="col-md-4">
                     <!-- small box -->
                     <div class="small-box bg-warning">
                         <div class="inner">
@@ -55,7 +55,7 @@ Dashboard
                         <div class="icon">
                             <i class=" fas fa-money"></i>
                         </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a href="{% url "sales_analytics" %}" class="small-box-footer">More infor <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 <!-- ./col -->

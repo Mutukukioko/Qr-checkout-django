@@ -1,0 +1,49 @@
+{% extends 'user/adminbase.html' %}
+{% block title %}
+Feedbacks
+{% endblock %}
+{% block content %}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+
+
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+<div class="container">
+    <h1>Message {{ shop.username }}</h1>
+    <hr>
+    {% for message in messages %}
+        <div class="card">
+            <div class="card-header">
+                {{ message.subject }}
+            </div>
+            <div class="card-body">
+                {{ message.body }}
+            </div>
+            <div class="card-footer text-muted">
+                {{ message.created_at }}
+            </div>
+        </div>
+        <br>
+    {% endfor %}
+    <div class="card">
+        <div class="card-header">
+            Send Message
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

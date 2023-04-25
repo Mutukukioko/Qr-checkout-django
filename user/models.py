@@ -59,7 +59,7 @@ class Item(models.Model):
         ('electricals','non electric'),
     )
     name = models.CharField(max_length=100)
-    shop_id = models.ForeignKey(Shop, on_delete = models.CASCADE)
+    shop = models.ForeignKey(Shop, on_delete = models.CASCADE)
     category = models.CharField(max_length = 254, null=True, choices= CATEGORY)
     brand = models.CharField(max_length = 254,default = "" )
     quantity = models.CharField(max_length = 254, default = "")
@@ -69,3 +69,17 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(blank=True, null=True)
+
+

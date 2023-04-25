@@ -16,7 +16,10 @@ path('shop_profile/',views.shop_profile, name='shop_profile'),
 #add shop product
 path('barcode/', views.generate_barcode, name='barcode_scanner'),
 path('shop_product/', views.shopProduct, name='shopProduct'),
-#OTHER
+#OTHER Admins
+path('shop_messages/<int:pk>/', views.message_view, name='shop_messages'),
+
+path('sales_analytics/',views.sales_analytics, name='sales_analytics'),
 path('addshop/', views.add_shop, name='add_shop'),
 path('payment_validation/', views.paymentVal, name='paymentVal'),
 path('cart/', views.cart, name = 'view_cart'),

@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Product, Cart,Shop, Item
-
+from .models import Product, Cart,Shop, Item, Message
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -45,3 +44,19 @@ class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
         fields = "__all__"
+
+
+
+
+
+
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ('subject', 'body')
+
+    def __init__(self, *args, **kwargs):
+        super(MessageForm, self).__init__(*args, **kwargs)
+        self.fields['subject'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Subject'})
+        self.fields['body'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Your message', 'rows': 4})

@@ -7,7 +7,7 @@ Scan Store
 
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
-  <section class="content">
+  <section class="content" style="display: flex; justify-content: center;">
     <div class="container-fluid">
       <br>
       {% if 'shop_id' in request.session %}
@@ -19,15 +19,16 @@ Scan Store
       {% endif %}
 
       <br>
-      <div class="row">
+      <div class="row" style="display: flex; justify-content: center;">
         
-        <div id="scan-area">
-          <video id="video" width="150px"></video>
-          <canvas id="canvas" style="display:none;"></canvas>
-        </div>
-        <div class="card card-primary">
+        
+        <div class="card card-teal">
           <div class="card-header">
             <h3 class="card-title">Scan the Store's QR </h3>
+          </div>
+          <div id="scan-area" class="col-md-4">
+            <video id="video" width="300px" ></video>
+            <canvas id="canvas" style="display: none;" ></canvas>
           </div>
 
           <form id="scan-form" class="col-lg-12 pb-3">
@@ -44,15 +45,17 @@ Scan Store
               <input type="text" id="qr-input" class="form-control" readonly required>
               <div class="row col-md-12 pt-2">
 
-                <div class="pr-1"><button type="button" id="start-scan-button">Start Scan</button></div>
-                <div class=" pr-2"><button type="" id="stop-scan-button">Stop Scan</button></div>
+                <div class="pr-1 pl-1">
+                  <button type="button" id="start-scan-button"  class="btn btn-sm bg-gradient-success text-bold">Start Scan</button>
+                </div>
+                <div class=" pr-2 pl-2"><button type="button" id="stop-scan-button" class="btn btn-sm bg-danger text-bold">Stop Scan</button></div>
               </div>
 
             </div>
 
-            <div class="center pt-3">
+            <div class="center pt-3 pl-5">
 
-              <button type="submit" class="btn btn-info pr-4 pl-4">Submit</button>
+              <button type="submit" class="btn bg-teal text-bold pr-4 pl-4">Submit</button>
             </div>
 
           </form>
@@ -163,11 +166,11 @@ Scan Store
       var csrftoken = getCookie('csrftoken');
 
       // Set the CSRF token as a header in the AJAX request
-      $.ajaxSetup({
-        headers: {
-          'X-CSRFToken': csrftoken
-        }
-      });
+      // $.ajaxSetup({
+      //   headers: {
+      //     'X-CSRFToken': csrftoken
+      //   }
+      // });
 
       // Get the form element
       var form = document.getElementById("scan-form");

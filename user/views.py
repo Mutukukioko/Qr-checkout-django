@@ -1,3 +1,4 @@
+from datetime import date,timedelta
 import io
 import os
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,7 +9,7 @@ from django.contrib import messages
 from .forms import *
 from .models import *
 import uuid
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.db import transaction
 import qrcode
 from django.core.files.base import ContentFile
@@ -176,8 +177,8 @@ def shop_profile(request):
             'email': email,
             'name':shop.name,
             'location':shop.location,
-            'image':shop.image,
-            'qrcode':shop.qrcode,
+            'image':shop.image.url,
+            'qrcode':shop.qrcode.url,
         }
         return render(request, 'user/shop_profile.html', data)
     else:
@@ -202,16 +203,12 @@ def shopProduct(request):
     return render(request, 'user/shop_product.html', {'title': 'Shopproducts', 'products': products})
 
 # scan the User generated Qr
-
-
 @login_required(login_url='/signin')
 @user_passes_test(lambda u: u.is_superuser)
 def scanQr(request):
     return render(request, 'user/scanQr.html')
 
 # add products to product table
-
-
 @login_required(login_url='/signin')
 @user_passes_test(lambda u: u.is_superuser)
 def generate_barcode(request):
@@ -238,7 +235,52 @@ def generate_barcode(request):
     return render(request, 'user/barcode.html', {'form': form})
 
 
-# ______________USER____________________
+
+@login_required(login_url='/signin')
+@user_passes_test(lambda u: u.is_superuser)
+def sales_analytics(request):
+    # Get daily sales data
+    daily_sales = Cart.objects.filter(
+        added_at__date=date.today()).aggregate(
+        total_sales=Sum('product__price'),
+        num_sales=Count('id')
+    )
+
+    # Get weekly sales data
+    week_ago = date.today() - timedelta(days=7)
+    weekly_sales = Cart.objects.filter(
+        added_at__date__gte=week_ago,
+        added_at__date__lte=date.today()
+    ).aggregate(
+        total_sales=Sum('product__price'),
+        num_sales=Count('id')
+    )
+
+    # Get monthly sales data
+    month_ago = date.today() - timedelta(days=30)
+    monthly_sales = Cart.objects.filter(
+        added_at__date__gte=month_ago,
+        added_at__date__lte=date.today()
+    ).aggregate(
+        total_sales=Sum('product__price'),
+        num_sales=Count('id')
+    )
+
+    # Get top selling products
+    top_selling_products = Product.objects.annotate(
+        num_sales=Count('cart__id')
+    ).order_by('-num_sales')[:10]
+
+    context = {
+        'daily_sales': daily_sales,
+        'weekly_sales': weekly_sales,
+        'monthly_sales': monthly_sales,
+        'top_selling_products': top_selling_products,
+    }
+
+    return render(request, 'user/sales_analytics.html', context)
+
+# ________________USER____________________
 
     # This is where the user starts his shopping session
 @login_required(login_url='/signin')
@@ -354,6 +396,7 @@ def store_cart(request):
 
     # Save the cart to the session
     request.session['cart'] = cart
+    messages.success(request,'Stored in cart successfully')
     return JsonResponse({'success': True})
 
 
@@ -411,7 +454,7 @@ def save_cart(request):
             qr_data = f"{cartId} paid"
             qr_code = qrcode.make(qr_data)
             qr_filename = f"{cartId}.png"
-            qr_path = os.path.join('qr_codes', qr_filename)
+            qr_path = os.path.join('media/qr_codes', qr_filename)
             qr_code.save(qr_path)
 
             cart_item.qr_code.name = qr_filename
@@ -612,6 +655,28 @@ def profile(request):
     else:
         # If the user is not authenticated, redirect them to the login page
         return redirect('signin')
+
+
+#messaging
+def message_view(request, shop_id):
+    shop = get_object_or_404(User, id=shop_id)
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user
+            message.receiver = shop
+            message.save()
+            messages.success(request, 'Message sent successfully')
+            return redirect('message_view', shop_id=shop_id)
+    else:
+        form = MessageForm()
+    messages = Message.objects.filter(sender=request.user, receiver=shop)
+    return render(request, 'message.html', {'form': form, 'shop': shop, 'messages': messages})
+
+
+
+
 
 
 # ____________Not neccessary code but in evaluation_______________________

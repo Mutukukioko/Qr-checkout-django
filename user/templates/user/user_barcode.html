@@ -10,6 +10,14 @@ Scan Product
     <section class="content">
         <div class="container-fluid">
 <div class="container">
+  {% if messages %}
+  {% for message in messages %}
+
+  <!-- In your HTML file -->
+<div class="alert-container"></div>
+
+  {% endfor %}
+  {% endif %}
   {% if 'shop_id' in request.session %}
             
                        
@@ -19,7 +27,7 @@ Scan Product
         {% endif %}
   <div class="row">
     <div class="col-md-6 offset-md-3">
-      <div class="card card-primary mt-5">
+      <div class="card card-teal mt-5">
         <div class="card-header text-center">
          
           <h4 class="float-left">Scan Barcode</h4> <img src="{{shop_image.url}}" alt="Product Image"
@@ -39,8 +47,8 @@ Scan Product
             <label for="name">Barcode value:</label>
             <input type="text" class="form-control" id="barcode" readonly name="barcode" required>
           </div>
-          <div class="form-group">
-            <button type="submit" class="btn btn-primary" id="start-scan">Add to Cart</button>
+          <div class="form-group" style="display:flex;justify-content: center;">
+            <button type="submit" class="btn btn-primary bg-teal" id="start-scan">Add to Cart</button>
             
           </div>
           </form>
@@ -81,7 +89,7 @@ function onScanSuccess(decodedText, decodedResult) {
         barcodeInput.value = decodedText;
         $.ajax({
       url: '/check_prod/',
-      data: {qr_input: barcodeInput.value},
+      data: {qr_input: barcodeInput.value,'csrfmiddlewaretoken': '{{ csrf_token }}'},
       success: function(data) {
         if (data.exists) {
           var inputElement = document.getElementById('name');
@@ -97,11 +105,11 @@ function onScanSuccess(decodedText, decodedResult) {
             // Hide the error span tag if it is visible
             $('#msgs').hide();
         } else {
-
+          $('#msgs').text(data.message);
           // Clear the Products name on the page
           $('#name').text('');
           $('#msg').hide();
-          $('#msgs').text(data.message);
+          
             // Hide the error span tag if it is visible
             
         }
@@ -128,20 +136,11 @@ html5QrcodeScanner.render(onScanSuccess, onScanFailure);
   var csrftoken = getCookie('csrftoken');
 
   // Set the CSRF token as a header in the AJAX request
-  $.ajaxSetup({
-    headers: {
-      'X-CSRFToken': csrftoken
-    }
-  });
-
-
-// $(document).ready(function() {
-  
-  // Add an event listener to the qr-input field
-//   $('#barcode').on('input', function() {
-//     var qrInput = $(this).val();
-//    });
-// });
+  // $.ajaxSetup({
+  //   headers: {
+  //     'X-CSRFToken': csrftoken
+  //   }
+  // });
 
 
 // Get the form element
@@ -211,6 +210,29 @@ window.onload = function() {
     formElements[i].value = "";
   }
 };
+<!-- In your JavaScript file -->
+function showLoginAlert() {
+  // Create a new alert element
+  const alert = document.createElement("div");
+  alert.classList.add("alert", "alert-success", "alert-dismissible", "fade", "show");
+  alert.innerHTML = `
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    Congratulations! You have successfully logged in.
+  `;
+  
+  // Add the alert element to the container
+  const container = document.querySelector(".alert-container");
+  container.appendChild(alert);
+  
+  // Set a timeout to remove the alert after a few seconds
+  setTimeout(() => {
+    container.removeChild(alert);
+  }, 5000); // Set the timeout to 5000 milliseconds (5 seconds)
+}
+
+// Call the function to show the alert when the user logs in
+showLoginAlert();
+
 </script>
 </div>
 </section>
