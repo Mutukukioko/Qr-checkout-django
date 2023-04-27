@@ -64,24 +64,23 @@
       </ul>
 
       <!-- Right navbar links -->
-      <ul class="navbar-nav ml-auto">
-
-
-        
-       
-        
         {% if 'shop_id' in request.session %}
+      <ul class="navbar-nav ml-auto">
+       
         <li class="nav-item">
           <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
             <span class="brand-text font-weight-light">
             
                {{ shop_name }}   
+               
             </span>
             <i class="nav-icon fas fa-bars "></i>
           </a>
+          
+               
         </li>
-                        
-        {% endif %}
+                     
+        
         <!-- Messages Dropdown Menu -->
         <li class="nav-item dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#">
@@ -140,6 +139,7 @@
         </li>
  
       </ul>
+      {% endif %}
     </nav>
 
     <aside class="main-sidebar elevation-4 sidebar-light-teal">

@@ -1,5 +1,4 @@
 from datetime import date,timedelta
-import io
 import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -15,12 +14,13 @@ import qrcode
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from io import BytesIO
-import base64
 from django.http import HttpResponse, JsonResponse
 from django.views import View
-from barcode.writer import ImageWriter
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .utils import specific_superuser_required
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 
 
 def logout_view(request):
@@ -161,7 +161,11 @@ def admin_home(request):
     # get the number of unique cart ids for a specific user
     unique_products = Product.objects.filter(
         user_id=user_id).values('id').distinct().count()
-    return render(request, 'user/home2.html', {'title': 'Home','items':unique_products})
+    total_sales =Cart.objects.filter(
+        user_id=user_id).values('cart_id').count()
+    
+    context = {'title': 'Home','items':unique_products, 'totals':total_sales}
+    return render(request, 'user/home2.html', context )
 
 # Shops Details
 @login_required(login_url='/signin')
@@ -267,15 +271,39 @@ def sales_analytics(request):
     )
 
     # Get top selling products
-    top_selling_products = Product.objects.annotate(
-        num_sales=Count('cart__id')
-    ).order_by('-num_sales')[:10]
+    
+    if  Cart.objects.filter(user_id = request.user).count() != 0:
+       top_selling_products = Cart.objects.values('product_id') \
+        .annotate(total=Count('product_id')) \
+        .order_by('-total')
+       for item in Cart.objects.all():
+        prod= Product.objects.get(id=item.product_id)
+        result = {
+            'product':prod.name,
+
+        }
+    else:
+        top_selling_products = {
+            'total':0
+        }
+        result={
+            
+        }
+
+    average_weekly_basket_size = Cart.objects.filter(
+        added_at__date__gte=week_ago,
+        added_at__date__lte=date.today()
+    ).annotate(
+        num_sales=Count('cart_id')
+    )
 
     context = {
         'daily_sales': daily_sales,
         'weekly_sales': weekly_sales,
         'monthly_sales': monthly_sales,
         'top_selling_products': top_selling_products,
+        'weekly_average_basket ':average_weekly_basket_size,
+        'result':result
     }
 
     return render(request, 'user/sales_analytics.html', context)
@@ -448,7 +476,7 @@ def save_cart(request):
 
             product = get_object_or_404(Product, id=product_id)
             cart_item = Cart(cart_id=cartId, user=request.user,
-                             product_id=product.id, barcode=product_dict['barcode'])
+                             product_id=product.id, barcode=product_dict['barcode'],shop=request.session['shop_id'])
 
             # Generate QR code and save as Base64 string in the database
             qr_data = f"{cartId} paid"
@@ -655,24 +683,6 @@ def profile(request):
     else:
         # If the user is not authenticated, redirect them to the login page
         return redirect('signin')
-
-
-#messaging
-def message_view(request, shop_id):
-    shop = get_object_or_404(User, id=shop_id)
-    if request.method == 'POST':
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            message = form.save(commit=False)
-            message.sender = request.user
-            message.receiver = shop
-            message.save()
-            messages.success(request, 'Message sent successfully')
-            return redirect('message_view', shop_id=shop_id)
-    else:
-        form = MessageForm()
-    messages = Message.objects.filter(sender=request.user, receiver=shop)
-    return render(request, 'message.html', {'form': form, 'shop': shop, 'messages': messages})
 
 
 

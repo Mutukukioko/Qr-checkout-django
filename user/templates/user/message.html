@@ -1,0 +1,101 @@
+{% extends 'user/adminbase.html' %}
+{% block title %}
+Feedbacks
+{% endblock %}
+{% block content %}
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4>Messages with {{ shop.username }}</h4>
+        </div>
+        <div class="card-body">
+          <div class="message-container">
+            {% for message in messages %}
+              {% if message.sender == user %}
+                <div class="sender-message">
+                  <p>{{ message.content }}</p>
+                </div>
+              {% else %}
+                <div class="receiver-message">
+                  <p>{{ message.content }}</p>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <form method="POST" id="message-form">
+            {% csrf_token %}
+            <div class="form-group">
+              <textarea name="message" class="form-control" rows="3" placeholder="Type your message here..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Real-time messaging using AJAX long-polling
+  $(document).ready(function() {
+    var messageForm = $('#message-form');
+    var messageContainer = $('.message-container');
+
+    // Function to handle incoming messages
+    function handleIncomingMessages(data) {
+      if (data.sender === '{{ user.username }}') {
+        var messageHtml = '<div class="sender-message"><p>' + data.content + '</p></div>';
+      } else {
+        var messageHtml = '<div class="receiver-message"><p>' + data.content + '</p></div>';
+      }
+      messageContainer.append(messageHtml);
+    }
+
+    // Function to send a message
+    function sendMessage(event) {
+      event.preventDefault();
+      var messageContent = messageForm.find('textarea').val();
+      $.ajax({
+        url: '{% url "send_message" shop_id=shop.id %}',
+        type: 'POST',
+        data: { 'message': messageContent, csrfmiddlewaretoken: '{{ csrf_token }}' },
+        dataType: 'json',
+        success: function(data) {
+          handleIncomingMessages(data);
+        }
+      });
+      messageForm[0].reset();
+    }
+
+    // Long-polling function to fetch new messages
+    function fetchNewMessages() {
+      $.ajax({
+        url: '{% url "fetch_messages" shop_id=shop.id %}',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+          if (data.hasOwnProperty('messages')) {
+            data.messages.forEach(function(message) {
+              handleIncomingMessages(message);
+            });
+          }
+        },
+        complete: function() {
+          // Recursive call after the request is complete
+          fetchNewMessages();
+        },
+        timeout: 5000  // Timeout after 5 seconds
+      });
+    }
+
+    // Start the long-polling process
+    fetchNewMessages();
+
+    // Bind the submit event to the message form
+    messageForm.on('submit', sendMessage);
+  });
+</script>
+{% endblock %}

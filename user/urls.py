@@ -17,7 +17,9 @@ path('shop_profile/',views.shop_profile, name='shop_profile'),
 path('barcode/', views.generate_barcode, name='barcode_scanner'),
 path('shop_product/', views.shopProduct, name='shopProduct'),
 #OTHER Admins
-path('shop_messages/<int:pk>/', views.message_view, name='shop_messages'),
+# path('message/<int:shop_id>/', views.message_view, name='message_view'),
+# path('message/<int:shop_id>/room/', views.message_room, name='message_room'),
+# path('ws/chat/<str:room_name>/', views.ChatConsumer.as_asgi()),
 
 path('sales_analytics/',views.sales_analytics, name='sales_analytics'),
 path('addshop/', views.add_shop, name='add_shop'),

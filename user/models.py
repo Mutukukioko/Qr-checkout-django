@@ -40,6 +40,7 @@ class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     cart_id = models.UUIDField(default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, default="")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     barcode = models.CharField(max_length=100, unique=True)
     qr_code = models.ImageField(upload_to='qr_codes', blank=True, null=True)
@@ -71,15 +72,5 @@ class Item(models.Model):
         return self.name
 
 
-
-
-
-class Message(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
-    subject = models.CharField(max_length=255)
-    body = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    read_at = models.DateTimeField(blank=True, null=True)
 
 

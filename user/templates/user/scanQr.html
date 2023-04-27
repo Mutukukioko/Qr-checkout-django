@@ -19,11 +19,10 @@ Scan Product
         {% endif %}
   <div class="row">
     <div class="col-md-6 offset-md-3">
-      <div class="card card-primary mt-5">
-        <div class="card-header text-center">
+      <div class="card card-teal mt-5">
+        <div class="card-header text-center" style="display: flex; justify-content: center;">
          
-          <h4 class="float-left">Scan Qr</h4> <img src="{{shop_image.url}}" alt="Product Image"
-          class="img-size-50 float-right">
+          <h4 class="float-left">Scan Qr</h4> 
         </div>
         <div class="card-body">
           <div id="reader"></div>
@@ -36,7 +35,7 @@ Scan Product
           </div>
           <div class="form-group">
             <label for="name">Cart Qr value:</label>
-            <input type="text" class="form-control" id="barcode"  name="barcode" >
+            <input type="text" class="form-control" id="barcode"  name="barcode" readonly required >
           </div>
           <div class="form-group">
             <button type="submit" class="btn btn-success" id="start-scan">Checkout</button>

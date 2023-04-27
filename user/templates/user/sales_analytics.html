@@ -1,7 +1,7 @@
 {% extends 'user/adminbase.html' %}
 {% load static %}
 {% block title %}
-Scanner
+analysis
 {% endblock %}
 {% block content %}
 
@@ -73,12 +73,20 @@ Scanner
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for product in top_selling_products %}
+                                    
                                     <tr>
-                                        <td>{{ product.name }}</td>
-                                        <td>{{ product.quantity_sold }}</td>
-                                    </tr>
+                                        {% if product in top_selling_products%}
+                                        <td>{{result.product }}</td>
+                                        {% for product in top_selling_products %}
+                                        <td>{{product.total}}</td>
+
                                     {% endfor %}
+                                    {% else %}
+
+                                    <td colspan="2" style=""> Nothing sold</td>
+
+                                    {% endif%}
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
