@@ -40,6 +40,7 @@ class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     cart_id = models.UUIDField(default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, default="")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     barcode = models.CharField(max_length=100, unique=True)
     qr_code = models.ImageField(upload_to='qr_codes', blank=True, null=True)
@@ -59,7 +60,7 @@ class Item(models.Model):
         ('electricals','non electric'),
     )
     name = models.CharField(max_length=100)
-    shop_id = models.ForeignKey(Shop, on_delete = models.CASCADE)
+    shop = models.ForeignKey(Shop, on_delete = models.CASCADE)
     category = models.CharField(max_length = 254, null=True, choices= CATEGORY)
     brand = models.CharField(max_length = 254,default = "" )
     quantity = models.CharField(max_length = 254, default = "")
@@ -69,3 +70,7 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+

@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Product, Cart,Shop, Item
 
-
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     class Meta:
@@ -45,3 +44,10 @@ class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
         fields = "__all__"
+
+
+
+
+
+
+

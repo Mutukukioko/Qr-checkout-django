@@ -1,4 +1,4 @@
-import io
+from datetime import date,timedelta
 import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -8,18 +8,19 @@ from django.contrib import messages
 from .forms import *
 from .models import *
 import uuid
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.db import transaction
 import qrcode
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from io import BytesIO
-import base64
 from django.http import HttpResponse, JsonResponse
 from django.views import View
-from barcode.writer import ImageWriter
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .utils import specific_superuser_required
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 
 
 def logout_view(request):
@@ -160,7 +161,11 @@ def admin_home(request):
     # get the number of unique cart ids for a specific user
     unique_products = Product.objects.filter(
         user_id=user_id).values('id').distinct().count()
-    return render(request, 'user/home2.html', {'title': 'Home','items':unique_products})
+    total_sales =Cart.objects.filter(
+        user_id=user_id).values('cart_id').count()
+    
+    context = {'title': 'Home','items':unique_products, 'totals':total_sales}
+    return render(request, 'user/home2.html', context )
 
 # Shops Details
 @login_required(login_url='/signin')
@@ -176,8 +181,8 @@ def shop_profile(request):
             'email': email,
             'name':shop.name,
             'location':shop.location,
-            'image':shop.image,
-            'qrcode':shop.qrcode,
+            'image':shop.image.url,
+            'qrcode':shop.qrcode.url,
         }
         return render(request, 'user/shop_profile.html', data)
     else:
@@ -202,16 +207,12 @@ def shopProduct(request):
     return render(request, 'user/shop_product.html', {'title': 'Shopproducts', 'products': products})
 
 # scan the User generated Qr
-
-
 @login_required(login_url='/signin')
 @user_passes_test(lambda u: u.is_superuser)
 def scanQr(request):
     return render(request, 'user/scanQr.html')
 
 # add products to product table
-
-
 @login_required(login_url='/signin')
 @user_passes_test(lambda u: u.is_superuser)
 def generate_barcode(request):
@@ -238,7 +239,76 @@ def generate_barcode(request):
     return render(request, 'user/barcode.html', {'form': form})
 
 
-# ______________USER____________________
+
+@login_required(login_url='/signin')
+@user_passes_test(lambda u: u.is_superuser)
+def sales_analytics(request):
+    # Get daily sales data
+    daily_sales = Cart.objects.filter(
+        added_at__date=date.today()).aggregate(
+        total_sales=Sum('product__price'),
+        num_sales=Count('id')
+    )
+
+    # Get weekly sales data
+    week_ago = date.today() - timedelta(days=7)
+    weekly_sales = Cart.objects.filter(
+        added_at__date__gte=week_ago,
+        added_at__date__lte=date.today()
+    ).aggregate(
+        total_sales=Sum('product__price'),
+        num_sales=Count('id')
+    )
+
+    # Get monthly sales data
+    month_ago = date.today() - timedelta(days=30)
+    monthly_sales = Cart.objects.filter(
+        added_at__date__gte=month_ago,
+        added_at__date__lte=date.today()
+    ).aggregate(
+        total_sales=Sum('product__price'),
+        num_sales=Count('id')
+    )
+
+    # Get top selling products
+    
+    if  Cart.objects.filter(user_id = request.user).count() != 0:
+       top_selling_products = Cart.objects.values('product_id') \
+        .annotate(total=Count('product_id')) \
+        .order_by('-total')
+       for item in Cart.objects.all():
+        prod= Product.objects.get(id=item.product_id)
+        result = {
+            'product':prod.name,
+
+        }
+    else:
+        top_selling_products = {
+            'total':0
+        }
+        result={
+            
+        }
+
+    average_weekly_basket_size = Cart.objects.filter(
+        added_at__date__gte=week_ago,
+        added_at__date__lte=date.today()
+    ).annotate(
+        num_sales=Count('cart_id')
+    )
+
+    context = {
+        'daily_sales': daily_sales,
+        'weekly_sales': weekly_sales,
+        'monthly_sales': monthly_sales,
+        'top_selling_products': top_selling_products,
+        'weekly_average_basket ':average_weekly_basket_size,
+        'result':result
+    }
+
+    return render(request, 'user/sales_analytics.html', context)
+
+# ________________USER____________________
 
     # This is where the user starts his shopping session
 @login_required(login_url='/signin')
@@ -354,6 +424,7 @@ def store_cart(request):
 
     # Save the cart to the session
     request.session['cart'] = cart
+    messages.success(request,'Stored in cart successfully')
     return JsonResponse({'success': True})
 
 
@@ -405,13 +476,13 @@ def save_cart(request):
 
             product = get_object_or_404(Product, id=product_id)
             cart_item = Cart(cart_id=cartId, user=request.user,
-                             product_id=product.id, barcode=product_dict['barcode'])
+                             product_id=product.id, barcode=product_dict['barcode'],shop=request.session['shop_id'])
 
             # Generate QR code and save as Base64 string in the database
             qr_data = f"{cartId} paid"
             qr_code = qrcode.make(qr_data)
             qr_filename = f"{cartId}.png"
-            qr_path = os.path.join('qr_codes', qr_filename)
+            qr_path = os.path.join('media/qr_codes', qr_filename)
             qr_code.save(qr_path)
 
             cart_item.qr_code.name = qr_filename
@@ -612,6 +683,10 @@ def profile(request):
     else:
         # If the user is not authenticated, redirect them to the login page
         return redirect('signin')
+
+
+
+
 
 
 # ____________Not neccessary code but in evaluation_______________________

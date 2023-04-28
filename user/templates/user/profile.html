@@ -1,4 +1,5 @@
 {% extends 'user/base.html' %}
+{% load static %}
 {% block title %}
 Profile
 {% endblock %}
@@ -16,14 +17,16 @@ Profile
     </section>
     <section class="content">
         <div class="container-fluid">
+            
             {% if username %}
-            <div class="card card-primary card-outline">
+            <div class="card card-teal card-outline">
                 <div class="container rounded bg-white mt-6 mb-5">
                     <div class="row">
                         <div class="col-md-3 border-right">
                             <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img
                                     class="rounded-circle mt-5" width="150px"
-                                    src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+
+                                    src="{% static 'img/avatar3.png'%}">
                                     <span
                                     class="font-weight-bold">{{first_name}}</span><span
                                     class="text-black-50">{{email}}</span><span>
@@ -33,7 +36,7 @@ Profile
                         <div class="col-md-5 border-right">
                             <div class="p-5 py-7">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h4 class="text-right">Profile</h4>
+                                    <h4 class="text-right text-muted">Profile</h4>
                                 </div>
                                 <div class="row mt-2">
                                     <div class="col-md-6"><label class="labels">First Name</label><input type="text"
@@ -47,7 +50,7 @@ Profile
                                 </div>
 
                                 <div class="mt-5 text-center">
-                                    <button type="button" class="btn btn-block bg-gradient-info btn-flat"
+                                    <button type="button" class="btn btn-block bg-gradient-teal btn-flat"
                                         data-toggle="modal" data-target="#modal-lg">Edit Profile</button>
 
                                     </button>
@@ -62,8 +65,8 @@ Profile
             <div class="modal fade" id="modal-lg">
                 <div class="modal-dialog modal-xs">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" class="">Edit Profile</h4>
+                        <div class="modal-header bg-gradient-teal">
+                            <h4 class="modal-title " class="">Edit Profile</h4>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -75,7 +78,7 @@ Profile
                                     <form id="myForm">
 
                                         <div class="text-center">
-                                            <img class="profile-user-img img-fluid img-circle" src=""
+                                            <img class="profile-user-img img-fluid img-circle" src="{% static 'img/avatar3.png'%}"
                                                 alt="User profile picture">
                                         </div>
 
@@ -95,7 +98,7 @@ Profile
                                             </li>
                                         </ul>
 
-                                        <button type="submit" class="btn btn-block bg-gradient-info btn-flat"
+                                        <button type="submit" class="btn btn-block bg-gradient-teal btn-flat"
                                             data-toggle="modal" data-target="#modal-lg">Update</button>
 
                                         </button>

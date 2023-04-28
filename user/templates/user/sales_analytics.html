@@ -1,0 +1,120 @@
+{% extends 'user/adminbase.html' %}
+{% load static %}
+{% block title %}
+analysis
+{% endblock %}
+{% block content %}
+
+<!-- Content Wrapper. Contains page content -->
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>User Cartitem</h1>
+                </div>
+
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+
+            <!-- sales_analytics.html -->
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="info-box bg-yellow">
+                        <span class="info-box-icon"><i class="fa fa-dollar"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Today's Sales</span>
+                            <span class="info-box-number">Ksh{{ daily_sales.total_sales }}</span>
+                            <span class="info-box-text">{{ daily_sales.num_sales }} sales</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-box bg-green">
+                        <span class="info-box-icon"><i class="fa fa-dollar"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Weekly Sales</span>
+                            <span class="info-box-number">Ksh{{ weekly_sales.total_sales }}</span>
+                            <span class="info-box-text">{{ weekly_sales.num_sales }} sales</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-box bg-blue">
+                        <span class="info-box-icon"><i class="fa fa-dollar"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Monthly Sales</span>
+                            <span class="info-box-number">Ksh{{ monthly_sales.total_sales }}</span>
+                            <span class="info-box-text">{{ monthly_sales.num_sales }} sales</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Top Selling Products</h3>
+                        </div>
+                        <div class="box-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Quantity Sold</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    <tr>
+                                        {% if product in top_selling_products%}
+                                        <td>{{result.product }}</td>
+                                        {% for product in top_selling_products %}
+                                        <td>{{product.total}}</td>
+
+                                    {% endfor %}
+                                    {% else %}
+
+                                    <td colspan="2" style=""> Nothing sold</td>
+
+                                    {% endif%}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Average Basket Size</h3>
+                        </div>
+                        <div class="box-body">
+                            <h4>Today: {{ daily_average_basket }}</h4>
+                            <h4>Weekly: {{ weekly_average_basket }}</h4>
+                            <h4>Monthly: {{ monthly_average_basket }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+        </div>
+    </section>
+</div>
+
+
+{% endblock %}
