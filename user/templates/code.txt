@@ -268,3 +268,64 @@ grouped_cart_list = list(grouped_cart_items.values())
     return JsonResponse(result)
 
 
+===========================================
+
+
+def save_cart(request):
+    if request.method == 'POST':
+        # Loop through each item in the cart
+        all_saved = True
+        cart = request.session['cart']
+        shop_id = request.session['shop_id']
+        shopi = get_object_or_404(Shop, user_id=shop_id)
+        # Create a list of products to save
+        products_to_save = []
+        for cart_item in cart.values():
+            for barcode in cart_item['barcodes']:
+                product_dict = {'id': cart_item['product']['id'], 'name': cart_item['product']['name'],
+                                'price': cart_item['product']['price'], 'image': cart_item['product']['image'],
+                                'barcode': barcode}
+                products_to_save.append(product_dict)
+        cartId = uuid.uuid4()
+        # Save the products to the database
+        for product_dict in products_to_save:
+            product_id = product_dict['id']
+
+            product = get_object_or_404(Product, id=product_id)
+
+            # Delete the product from the product table
+            product.delete()
+
+            # Save the product to the item table
+            item = Repo(name=product.name, price=product.price, image=product.picture, barcode=product_dict['barcode'], shop=shopi)
+            item.save()
+
+            cart_item = Cart(cart_id=cartId, user=request.user, product_id=item.id, shop=shopi)
+
+            # Generate QR code and save as Base64 string in the database
+            qr_data = f"{cartId} paid"
+            qr_code = qrcode.make(qr_data)
+            qr_filename = f"{cartId}.png"
+            qr_path = os.path.join('media/qr_codes', qr_filename)
+            qr_code.save(qr_path)
+
+            cart_item.qr_code.name = qr_filename
+            cart_item.save()
+            
+            all_saved = True
+
+        # Clear the cart
+        if all_saved == True:
+            request.session['cart'] = {}
+            messages.success(request, 'Cart cleared.')
+            return redirect('home')
+        else:
+            messages.warning(request, 'Cart not cleared.')
+            return redirect('home')
+
+    else:
+        return redirect('add')
+
+
+
+        

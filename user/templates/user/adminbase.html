@@ -35,13 +35,17 @@
   </title>
   {% if messages %}
   {% for message in messages %}
-
-  <script>
-    alert("{{ message }}");
-  </script>
-
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} " style="font-family: 'Times New Roman', Times, serif; font-weight: 300;" role="alert">
+      {{ message }}
+      <script>
+        setTimeout(function() {
+          $('.alert').fadeOut('fast');
+        }, 5000);
+      </script>
+    </div>
   {% endfor %}
-  {% endif %}
+{% endif %}
+
 
 
 </head>
@@ -64,28 +68,17 @@
       </ul>
 
       <!-- Right navbar links -->
-        {% if 'shop_id' in request.session %}
+        {% if user.is_authenticated %}
       <ul class="navbar-nav ml-auto">
        
-        <li class="nav-item">
-          <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-            <span class="brand-text font-weight-light">
-            
-               {{ shop_name }}   
-               
-            </span>
-            <i class="nav-icon fas fa-bars "></i>
-          </a>
-          
-               
-        </li>
+         
                      
         
         <!-- Messages Dropdown Menu -->
         <li class="nav-item dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#">
             <i class="far fa-comments"></i>
-            <span class="badge badge-danger navbar-badge">3</span>
+            <span class="badge badge-danger navbar-badge">0</span>
           </a>
           <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             
@@ -94,15 +87,18 @@
             <a href="#" class="dropdown-item">
               <!-- Message Start -->
               <div class="media">
-                <img src="dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                <!-- <img src="dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3"><br> -->
                 <div class="media-body">
-                  <h3 class="dropdown-item-title">
+                  <!-- <h3 class="dropdown-item-title">
                     Nora Silvester
                     <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
                   </h3>
+                  <br>
                   <p class="text-sm">The subject goes here</p>
-                  <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                  <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 0 Hours Ago</p> -->
+                  on development
                 </div>
+                
               </div>
               <!-- Message End -->
             </a>
@@ -114,24 +110,24 @@
         <li class="nav-item dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#">
             <i class="far fa-bell"></i>
-            <span class="badge badge-warning navbar-badge">15</span>
+            <span class="badge badge-warning navbar-badge">0</span>
           </a>
           <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <span class="dropdown-item dropdown-header">15 Notifications</span>
+            <span class="dropdown-item dropdown-header">0 Notifications</span>
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item">
-              <i class="fas fa-envelope mr-2"></i> 4 new messages
-              <span class="float-right text-muted text-sm">3 mins</span>
+              <i class="fas fa-envelope mr-2"></i> 0 new messages
+              <span class="float-right text-muted text-sm">0 mins</span>
             </a>
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item">
-              <i class="fas fa-users mr-2"></i> 8 friend requests
-              <span class="float-right text-muted text-sm">12 hours</span>
+              <i class="fas fa-users mr-2"></i> 0 friend requests
+              <span class="float-right text-muted text-sm">0 hours</span>
             </a>
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item">
-              <i class="fas fa-file mr-2"></i> 3 new reports
-              <span class="float-right text-muted text-sm">2 days</span>
+              <i class="fas fa-file mr-2"></i> 0 new reports
+              <span class="float-right text-muted text-sm">0 days</span>
             </a>
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
@@ -280,6 +276,13 @@
 
     {% endblock %}
   </div>
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2022-2023 <a href="">QRQUICK.io</a>.</strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+      <b>Version</b> 0.0.1
+    </div>
+  </footer>
 
   <!-- jQuery -->
   <script src="{% static 'user/assets/plugins/jquery/jquery.min.js' %}"></script>

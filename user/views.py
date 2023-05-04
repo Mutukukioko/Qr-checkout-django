@@ -1,8 +1,11 @@
+from base64 import urlsafe_b64decode
 from datetime import date,timedelta
+from email.message import EmailMessage
 import os
+import smtplib
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.shortcuts import HttpResponseRedirect
 from django.contrib import messages
 from .forms import *
@@ -14,13 +17,19 @@ import qrcode
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from io import BytesIO
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.views import View
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .utils import specific_superuser_required
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
+from django.db.models import Avg
+from django.db.models.functions import TruncMonth, TruncWeek
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 def logout_view(request):
@@ -157,14 +166,20 @@ def add_shop(request):
 @login_required(login_url='/signin')
 @user_passes_test(lambda u: u.is_superuser)
 def admin_home(request):
-    user_id = request.user
+    userid = request.user
     # get the number of unique cart ids for a specific user
     unique_products = Product.objects.filter(
-        user_id=user_id).values('id').distinct().count()
-    total_sales =Cart.objects.filter(
-        user_id=user_id).values('cart_id').count()
+        user_id=userid).values('id').distinct().count()
     
-    context = {'title': 'Home','items':unique_products, 'totals':total_sales}
+    shop=Shop.objects.get(user_id=request.user)
+    total_sales =Cart.objects.filter(
+        shop_id=shop.id).values('cart_id').distinct().count()
+    
+    context = {'title': 'Home',
+               'items':unique_products,
+                'totals':total_sales,
+                'image':shop.image.url,
+                }
     return render(request, 'user/home2.html', context )
 
 # Shops Details
@@ -193,23 +208,47 @@ def shop_profile(request):
 @login_required(login_url='/signin')
 @user_passes_test(lambda u: u.is_superuser)
 def cartdash(request):
-    carts = Cart.objects.all()
-    return render(request, 'user/cartdash.html', {'title': 'Dashboard', 'carts': carts})
+    shop=Shop.objects.get(user_id=request.user)
+
+    carts = Cart.objects.filter(shop_id=shop.id)
+    context = {'title': 'Dashboard',
+            'carts': carts,
+            'username': request.user.username,
+            'image':shop.image.url,
+        }
+    return render(request, 'user/cartdash.html', context)
 
 # Admin product dashboard
 @login_required(login_url='/signin')
 @user_passes_test(lambda u: u.is_superuser)
 # group products by description and count how many have the same description
 def shopProduct(request):
-    products = Product.objects.values('description', 'name', 'brand', 'price', 'picture') \
-        .annotate(total=Count('description')) \
+    # get current user
+    user = request.user
+    #get count of products 
+    
+    product = Product.objects.filter(user_id=user.id).annotate(total=Count('description')) \
         .order_by('-total')
-    return render(request, 'user/shop_product.html', {'title': 'Shopproducts', 'products': products})
+    
+    shop=Shop.objects.get(user_id=request.user)
+    context = {
+        'title': 'Shopproducts', 
+        'product':product,
+        'username': request.user.username,
+        'image':shop.image.url,
+        }
+    return render(request, 'user/shop_product.html',context)
 
 # scan the User generated Qr
 @login_required(login_url='/signin')
 @user_passes_test(lambda u: u.is_superuser)
 def scanQr(request):
+    shop=Shop.objects.get(user_id=request.user)
+    context = {
+        'title': 'Scan Qr', 
+        'username': request.user.username,
+        'image':shop.image.url,
+        }
     return render(request, 'user/scanQr.html')
 
 # add products to product table
@@ -227,25 +266,42 @@ def generate_barcode(request):
 
         # get current user
         user = request.user
+# check if the barcode already exists
+        if Product.objects.filter(barcode=barcode).exists():
+            messages.error(request, 'Product with the given barcode already exists')
+            return redirect('barcode_scanner')
+        else:
+            # create new product
+            product = Product(name=name, price=price, category=category, brand=brand, barcode=barcode, description=description, picture=picture, user=user)
+            product.save()
 
-        # create new product
-        product = Product(name=name, price=price, category=category, brand=brand, barcode=barcode, description=description, picture=picture, user=user)
-        product.save()
-
-        messages.success(request, 'Product has been added successfully')
-
+            messages.success(request, 'Product has been added successfully')
+            form = Product_Form()
+            return render(request, 'user/barcode.html', {'form': form})
+            
     else:
+        shop=Shop.objects.get(user_id=request.user)
         form = Product_Form()
-    return render(request, 'user/barcode.html', {'form': form})
+        context = {
+            'title': 'Scan Qr', 
+            'username': request.user.username,
+            'image':shop.image.url,
+            'form': form
+            }
+        return render(request, 'user/barcode.html', context)
 
 
 
 @login_required(login_url='/signin')
 @user_passes_test(lambda u: u.is_superuser)
 def sales_analytics(request):
+    shop=Shop.objects.get(user_id=request.user)
     # Get daily sales data
+
     daily_sales = Cart.objects.filter(
-        added_at__date=date.today()).aggregate(
+        added_at__date=date.today(),
+        shop_id=shop.id
+    ).aggregate(
         total_sales=Sum('product__price'),
         num_sales=Count('id')
     )
@@ -253,6 +309,7 @@ def sales_analytics(request):
     # Get weekly sales data
     week_ago = date.today() - timedelta(days=7)
     weekly_sales = Cart.objects.filter(
+        shop_id=shop.id,
         added_at__date__gte=week_ago,
         added_at__date__lte=date.today()
     ).aggregate(
@@ -263,6 +320,7 @@ def sales_analytics(request):
     # Get monthly sales data
     month_ago = date.today() - timedelta(days=30)
     monthly_sales = Cart.objects.filter(
+        shop_id=shop.id,
         added_at__date__gte=month_ago,
         added_at__date__lte=date.today()
     ).aggregate(
@@ -270,40 +328,62 @@ def sales_analytics(request):
         num_sales=Count('id')
     )
 
-    # Get top selling products
-    
-    if  Cart.objects.filter(user_id = request.user).count() != 0:
-       top_selling_products = Cart.objects.values('product_id') \
-        .annotate(total=Count('product_id')) \
-        .order_by('-total')
-       for item in Cart.objects.all():
-        prod= Product.objects.get(id=item.product_id)
-        result = {
-            'product':prod.name,
+    # Get average basket size for today
+    today_avg_basket_size = Cart.objects.filter(
+        shop_id=shop.id,
+        added_at__date=date.today()
+    ).aggregate(
+        avg_basket_size=Avg('cart_id', distinct=True)
+    )
 
-        }
-    else:
-        top_selling_products = {
-            'total':0
-        }
-        result={
-            
-        }
-
-    average_weekly_basket_size = Cart.objects.filter(
+    # Get average basket size for this week
+    weekly_avg_basket_size = Cart.objects.filter(
+        shop_id=shop.id,
         added_at__date__gte=week_ago,
         added_at__date__lte=date.today()
     ).annotate(
-        num_sales=Count('cart_id')
+        week=TruncWeek('added_at')
+    ).values('week').annotate(
+        avg_basket_size=Avg('cart_id', distinct=True)
     )
 
+    # Get average basket size for this month
+    month_ago = date.today() - timedelta(days=180)
+    monthly_avg_basket_size = Cart.objects.filter(
+        shop_id=shop.id,
+        added_at__date__gte=month_ago,
+        added_at__date__lte=date.today()
+    ).annotate(
+        month=TruncMonth('added_at')
+    ).values('month').annotate(
+        avg_basket_size=Avg('cart_id', distinct=True)
+    )
+
+    # Get data for the current month only
+    current_month = timezone.now().month
+    current_month_data = monthly_avg_basket_size.filter(month__month=current_month)
+
+    # Exclude the current month from the main data
+    monthly_avg_basket_size = monthly_avg_basket_size.exclude(month__month=current_month)
+
+
+    # Get top selling products
+    top_selling_products = Cart.objects.filter(shop_id=shop.id).values('product_id', 'product__name', 'product__picture', 'product__price') \
+    .annotate(total_sales=Count('product_id')) \
+    .order_by('-total_sales')[:10]
+    shop=Shop.objects.get(user_id=request.user)
+    
     context = {
         'daily_sales': daily_sales,
         'weekly_sales': weekly_sales,
         'monthly_sales': monthly_sales,
+        'today_avg_basket_size': today_avg_basket_size,
+        'weekly_avg_basket_size': weekly_avg_basket_size,
+        'monthly_avg_basket_size': monthly_avg_basket_size,
         'top_selling_products': top_selling_products,
-        'weekly_average_basket ':average_weekly_basket_size,
-        'result':result
+        'title': 'Shopproducts', 
+        'username': request.user.username,
+        'image':shop.image.url,
     }
 
     return render(request, 'user/sales_analytics.html', context)
@@ -461,6 +541,8 @@ def save_cart(request):
         # Loop through each item in the cart
         all_saved = True
         cart = request.session['cart']
+        shop_id = request.session['shop_id']
+        shopi = get_object_or_404(Shop, user_id=shop_id)
         # Create a list of products to save
         products_to_save = []
         for cart_item in cart.values():
@@ -476,7 +558,7 @@ def save_cart(request):
 
             product = get_object_or_404(Product, id=product_id)
             cart_item = Cart(cart_id=cartId, user=request.user,
-                             product_id=product.id, barcode=product_dict['barcode'],shop=request.session['shop_id'])
+                             product_id=product.id, barcode=product_dict['barcode'],shop=shopi)
 
             # Generate QR code and save as Base64 string in the database
             qr_data = f"{cartId} paid"
@@ -501,7 +583,6 @@ def save_cart(request):
 
     else:
         return redirect('add')
-
 # remove cart items from the cart session
 
 
@@ -757,3 +838,100 @@ class ResultView(View):
             item.save()
             return HttpResponseRedirect('/barcode/')
         return render(request, 'user/barcode.html', {'form': form})
+
+
+class PasswordResetView(View):
+
+    def get(self, request):
+        form = PasswordResetForm()
+        return render(request, 'user/password_reset_form.html', {'form': form})
+
+    def post(self, request):
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            # Get the user with the specified email address
+            email = form.cleaned_data['email']
+            user = User.objects.filter(email=email).first()
+
+            if user is not None:
+                # Generate a token for the password reset link
+                token_generator = PasswordResetTokenGenerator()
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = token_generator.make_token(user)
+
+                # Send the password reset link to the user's email address
+                subject = 'Password reset for your account'
+                message = f'Please click on the following link to reset your password: {settings.BASE_URL}/reset-password/{uid}/{token}'
+                recipient_list = [email]
+                smtp_connection = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
+                smtp_connection.starttls()
+                smtp_connection.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+
+
+                try:
+                    email_message = EmailMessage(
+                        subject='Password reset for your account',
+                        body=f'Please click on the following link to reset your password: {settings.BASE_URL}/reset-password/{uid}/{token}',
+                        from_email=settings.EMAIL_HOST_USER,
+                        to=[email],
+                    )
+                    email_message.send()
+                    return HttpResponse('Password reset email sent.')
+                except Exception as e:
+                    print(e)
+                    return HttpResponse('An error occurred while sending the password reset email.')
+
+            # Always return a success message to avoid leaking information
+            return HttpResponse('Password reset email sent.')
+
+        return render(request, 'user/password_reset_form.html', {'form': form})
+
+
+class PasswordResetConfirmView(View):
+
+    def get(self, request, uidb64, token):
+        try:
+            # Decode the user ID from the URL parameter
+            uid = urlsafe_b64decode(uidb64).decode('utf-8')
+
+            # Get the user with the specified ID
+            user = User.objects.get(pk=uid)
+
+            # Check if the token is valid
+            token_generator = PasswordResetTokenGenerator()
+            if not token_generator.check_token(user, token):
+                return HttpResponseBadRequest('Invalid password reset link.')
+
+            # Display the password reset form
+            form = SetPasswordForm(user)
+            return render(request, 'user/password_reset_confirm.html', {'form': form})
+
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            return HttpResponseBadRequest('Invalid password reset link.')
+
+    def post(self, request, uidb64, token):
+        try:
+            # Decode the user ID from the URL parameter
+            uid = urlsafe_b64decode(uidb64).decode('utf-8')
+
+            # Get the user with the specified ID
+            user = User.objects.get(pk=uid)
+
+            # Check if the token is valid
+            token_generator = PasswordResetTokenGenerator()
+            if not token_generator.check_token(user, token):
+                return HttpResponseBadRequest('Invalid password reset link.')
+
+            # Process the password reset form
+            form = SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                user = form.save()
+                user = authenticate(username=user.username, password=form.cleaned_data['new_password1'])
+                login(request, user)
+                return HttpResponse('Password reset successful.')
+            else:
+                return render(request, 'user/password_reset_confirm.html', {'form': form})
+
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            return HttpResponseBadRequest('Invalid password reset link.')
+

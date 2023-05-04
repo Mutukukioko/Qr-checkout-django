@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Product, Cart,Shop, Item
+from .models import Product, Cart,Shop, Repo
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -42,11 +42,12 @@ class Shop_Form(forms.ModelForm):
 
 class ItemForm(forms.ModelForm):
     class Meta:
-        model = Item
+        model = Repo
         fields = "__all__"
 
 
-
+class PasswordResetForm(forms.Form):
+    email = forms.EmailField()
 
 
 

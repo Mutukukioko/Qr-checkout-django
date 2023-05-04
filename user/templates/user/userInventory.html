@@ -31,33 +31,29 @@ Inventory
             <!-- /.row -->
 
             <!-- TABLE: LATEST ORDERS -->
-            <div class="card">
-              <div class="card-header border-transparent">
-                <h3 class="card-title">Latest Orders</h3>
+            
 
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
-                  </button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove">
-                    <i class="fas fa-times"></i>
-                  </button>
+           
+
+              <div class="card">
+                <div class="card-header bg-teal">
+                  <h3 class="card-title">All  ORDERS</h3>
                 </div>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body p-0">
-                <div class="table-responsive">
-                  <table class="table m-0">
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <div class="table-responsive">
+                  <table id="example1" class="table table-bordered table-striped ">
                     <thead>
-                      <tr>
-                        <th>Order ID</th>
+                    <tr>
+                      <th>Order ID</th>
                         <th>Item</th>
                         <th>Image</th>
                         <th>Quantity</th>
                         <th>Cost</th>
-                      </tr>
+                    </tr>
                     </thead>
                     <tbody>
+                    
                       {% for product_desc, group_info in product_groups.items %}
                       
                       <tr>
@@ -66,19 +62,13 @@ Inventory
                         <td><img src="{{group_info.image.url}}" alt="Product Image"
                           class="img-size-50" ></td>
                         <td><span class="badge badge-success">{{ group_info.quantity }} </span></td>
-                        <td>{{ group_info.cost }}</td>
+                        <td>Ksh {{ group_info.cost }}</td>
                       </tr>
                       {% endfor %}
-                    </tbody>
                   </table>
                 </div>
-                <!-- /.table-responsive -->
+                <!-- /.card-body -->
               </div>
-              <!-- /.card-body -->
-              <div class="card-footer clearfix">
-                change to pagination
-              </div>
-              <!-- /.card-footer -->
             </div>
             <!-- /.card -->
           </div>
@@ -90,7 +80,7 @@ Inventory
               <span class="info-box-icon"><i class="fas fa-tag"></i></span>
 
               <div class="info-box-content">
-                <span class="info-box-text">Inventory</span>
+                <span class="info-box-text">Orders</span>
                 <span class="info-box-number">{{Count}}</span>
               </div>
               <!-- /.info-box-content -->
@@ -136,4 +126,21 @@ Inventory
     <!-- /.content -->
   </div>
 
+  <script>
+    $(function () {
+    $("#example1").DataTable({
+      "responsive": true, "lengthChange": false, "autoWidth": false,
+      "buttons": [ "csv", "excel", "pdf", "print", "colvis"]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+  </script>
 {% endblock %}

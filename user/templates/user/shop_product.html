@@ -31,58 +31,50 @@ Shops Product
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <table id="example2" class="table table-bordered table-hover">
+              <div class="table-responsive">
+              <table id="example1" class="table table-bordered table-striped ">
                 <thead>
-                  <tr>
-                    <th>Product name</th>
-                    <th>Brand</th>
-                    <th>Quantity</th>
-                    <th>picture</th>
-                    <th>Price</th>
-                    <th>Action</th>
-                  </tr>
-                  {% for i in products %}
+                <tr>
+                  <th>Product name</th>
+                  <th>Brand</th>
+                  <th>Quantity</th>
+                  <th>picture</th>
+                  <th>Price</th>
+                  <!-- <th>Action</th> -->
+                </tr>
+                </thead>
+                <tbody>
+                  {% for i in product %}
                   <tr>
 
 
                     <td>{{ i.name }}</td>
                     <td>{{ i.brand}}</td>
                     <td>{{ i.total }}</td>
-                    <td><img src="{{ i.picture.url }}" alt="Image" class="img-size-50"></td>
-                    <td>{{ i.price}}</td>
-                    <td>
+                    <td><img src="{{ i.picture.url }}" alt="Image" class="img-size-50">
+                    </td>
+                    <td>Ksh {{ i.price}}</td>
+                    <!-- <td>
                       <div class="input-group input-group-md mb-3">
                         <div class="input-group-prepend">
                           <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
                             Action
                           </button>
-                          <ul class="dropdown-menu">
+                          <ul class="dropdown-menu bg-gradient-teal">
                             <li class="dropdown-item"><a href="#">Delete</a></li>
-                            <li class="dropdown-item"><a href="#">Edit</a></li>
+                            <li class="dropdown-item text-bold "><a href="#">Edit</a></li>
                           </ul>
                         </div>
                       </div>
-                    </td>
+                    </td> -->
                   </tr>
                   {% endfor %}
-
-                  </tbody>
-                <tfoot>
-                  <tr>
-                    <th>Product name</th>
-                    
-                    <th>Brand</th>
-                    <th>Quantity</th>
-                    <th>picture</th>
-                    <th>Price</th>
-                    <th>Action</th>
-                  </tr>
-                </tfoot>
+                  
               </table>
             </div>
             <!-- /.card-body -->
           </div>
-          <!-- /.card -->
+              
 
 
           <!-- /.card -->
@@ -95,5 +87,21 @@ Shops Product
   </section>
   <!-- /.content -->
 </div>
-
+<script>
+  $(function () {
+  $("#example1").DataTable({
+    "responsive": true, "lengthChange": false, "autoWidth": false,
+    "buttons": [ "csv", "excel", "pdf", "print", "colvis"]
+  }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+  $('#example2').DataTable({
+    "paging": true,
+    "lengthChange": false,
+    "searching": false,
+    "ordering": true,
+    "info": true,
+    "autoWidth": false,
+    "responsive": true,
+  });
+});
+</script>
 {% endblock %}

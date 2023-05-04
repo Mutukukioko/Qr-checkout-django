@@ -3,16 +3,20 @@
 {% block title %}
 Dashboard
 {% endblock %}
+{% block extrahead %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
 {% block content %}
+
 <br>
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
+    
     <!-- Main content -->
     <section class="content">
-
         <br>
->>>>>>> 245c89a1049156fbf42419bd11bbbe504fa28ddd
         <div class="container-fluid">
             <!-- Small boxes (Stat box) -->
             <div class="row">
@@ -22,7 +26,7 @@ Dashboard
                         <div class="inner">
                             <h3>{{items}}</h3>
 
-                            <p>Total Products</p>
+                            <p>Registered Products</p>
                         </div>
                         <div class="icon">
                             <i class="fas fa-bag"></i>
@@ -35,7 +39,7 @@ Dashboard
                     <!-- small box -->
                     <div class="small-box bg-success">
                         <div class="inner">
-                            <h3>53<sup style="font-size: 20px">%</sup></h3>
+                            <h3><sup >{{totals}}</sup></h3>
 
                             <p>Cart Logs</p>
                         </div>
@@ -55,7 +59,7 @@ Dashboard
                             <p>Total Sales</p>
                         </div>
                         <div class="icon">
-                            <i class=" fas fa-money"></i>
+                            <i class="fas fa-chart-line"></i>
                         </div>
                         <a href="{% url "sales_analytics" %}" class="small-box-footer">More infor <i class="fas fa-arrow-circle-right"></i></a>
                     </div>

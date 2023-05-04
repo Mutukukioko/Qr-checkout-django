@@ -39,14 +39,14 @@ Cart
                 <li class="item">
 
                   <div class="product-img">
-                    <img src="{{ cart_item.product.picture.url }}" alt="Product Image"
-                      class="img-size-50">
+                    <img src="{{ cart_item.product.picture.url }}" alt="Product Image" class="img-size-50">
                   </div>
 
                   <div class="product-info">
                     <a href="javascript:void(0)" class="product-title">{{ cart_item.product.name }}
-                      
-                      <span class="badge badge-warning float-right">Ksh{{ cart_item.product.price|floatformat:2|multiply:cart_item.quantity }}</span></a>
+
+                      <span id="cart_money" class="badge badge-warning float-right">Ksh{{
+                        cart_item.product.price|floatformat:2|multiply:cart_item.quantity }}</span></a>
                     <span class="product-description">
                       {{cart_item.product.description}}
 
@@ -58,35 +58,34 @@ Cart
                         readonly value="{{ cart_item.quantity }}" size="1" min="1" max="100">
 
 
-                        {% if cart_item.barcodes|length > 1 %}
-                        <div class="input-group input-group-md mb-3">
-                          <div class="input-group-prepend">
-                            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-                              Choose prod barcode to remove
-                            </button>
-                            <ul class="dropdown-menu">
-                              {% for barcode in cart_item.barcodes %}
-                              <li> <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item"
-                                        data-product-id="{{ cart_item.product.name }}"
-                                        data-barcode-value="{{ barcode }}" title="Remove item">
-                                        {{ barcode }} 
-                                        <i class="fas fa-trash"></i>
-                                  </button>
-                              </li>
-                             {% endfor %}
-                            </ul>
-                          </div>
+                      {% if cart_item.barcodes|length > 1 %}
+                      <div class="input-group input-group-md mb-3">
+                        <div class="input-group-prepend">
+                          <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+                            Choose prod barcode to remove
+                          </button>
+                          <ul class="dropdown-menu">
+                            {% for barcode in cart_item.barcodes %}
+                            <li> <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item"
+                                data-product-id="{{ cart_item.product.name }}" data-barcode-value="{{ barcode }}"
+                                title="Remove item">
+                                {{ barcode }}
+                                <i class="fas fa-trash"></i>
+                              </button>
+                            </li>
+                            {% endfor %}
+                          </ul>
                         </div>
-                        {% else %}
-                        {% for barcode in cart_item.barcodes %}
-                        <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item"
-                                   >
-                                  
-                                  <i class="fas fa-trash"data-product-id="{{ cart_item.product.name }}"
-                                  data-barcode-value="{{ barcode }}" title="Remove item"></i>
-                            </button>
-                        
-                       {% endfor %}
+                      </div>
+                      {% else %}
+                      {% for barcode in cart_item.barcodes %}
+                      <button type="button" class="btn btn-danger btn-sm me-1 mb-2 remove-item pr-2">
+
+                        <i class="fas fa-trash" data-product-id="{{ cart_item.product.name }}"
+                          data-barcode-value="{{ barcode }}" title="Remove item"></i>
+                      </button>
+
+                      {% endfor %}
                       {% endif %}
 
                     </div>
@@ -108,7 +107,7 @@ Cart
             </div>
             {% endif %}
             <!-- /.card-body -->
-<div class="card-footer card-teal bg-gradient-teal " style="inline-size:auto;"></div>
+            <div class="card-footer card-teal bg-gradient-teal " style="inline-size:auto;"></div>
             <!-- /.card-footer -->
           </div>
         </div>
@@ -122,8 +121,9 @@ Cart
               <!-- content ya card hapa -->
               <div class="row">
                 <div class="col-4">Total Amount </div>
-                <input type="text" class="text-center form-control" id="total" readonly value="5000">
+                <input type="text" class="text-center form-control" id="total_cash" name="total_cash" readonly>
               </div>
+
 
 
               <br>
@@ -131,10 +131,10 @@ Cart
                 {% csrf_token %}
                 <button type="submit">Save Cart</button>
               </form>
-<br>              
+              <br>
               <div class="button">
                 <button type="button" class="btn btn-block bg-gradient-teal btn-flat text-bold" data-toggle="modal"
-                data-target="#modal-lg" style="font-family: 'Times New Roman', Times, serif;">Checkout</button>
+                  data-target="#modal-lg" style="font-family: 'Times New Roman', Times, serif;">Checkout</button>
 
               </div>
               </button>
@@ -148,8 +148,8 @@ Cart
 
     <div class="modal fade" id="modal-lg">
       <div class="modal-dialog modal-xs">
-        <div class="modal-content"  >
-          <div class="modal-header bg-teal" style="display: flex; justify-content: center;" >
+        <div class="modal-content">
+          <div class="modal-header bg-teal" style="display: flex; justify-content: center;">
             <h4 class="modal-title text-bold" style="font-family: 'Times New Roman', Times, serif;">Payment Process</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
@@ -165,9 +165,10 @@ Cart
                   </div>
                   <div class="card-body">
                     <div class="form-group">
-                      <input type="number" class="form-control" id="m-pesa-number" placeholder="Enter your m-pesa number">
+                      <input type="number" class="form-control" id="m-pesa-number"
+                        placeholder="Enter your m-pesa number">
                     </div>
-  
+
                     <div class="form-group">
                       <input type="number" class="form-control" id="till" placeholder="Enter your stores till">
                     </div>
@@ -181,7 +182,7 @@ Cart
 
               <div class="row">
                 <div class="col-4">Total Amount </div>
-                <div class="col-4  " id="total">5</div>
+                <input type="text" readonly class=" form-control col-4" id="total" value="1">
               </div>
             </div>
 
@@ -197,13 +198,45 @@ Cart
   </section>
 </div>
 <script>
+  // get all the cart item price elements and calculate the total
+  var cartItemPrices = document.querySelectorAll("#cart_money");
+  var total = 0;
+  for (var i = 0; i < cartItemPrices.length; i++) {
+    var priceString = cartItemPrices[i].innerHTML;
+    var price = parseFloat(priceString.replace(/[^\d.-]/g, ''));
+    total += price;
+  }
+
+  // set the value of the total_cash input field to the total
+  var totalCashInput = document.getElementById("total_cash");
+  totalCashInput.value = "Ksh " + total.toFixed(2);
+</script>
+
+<script>
+  // Get all the money tags in the cart
+  var moneyTags = document.querySelectorAll('#cart_items');
+
+  // Loop through each money tag and add up the values
+  var total = 0;
+  for (var i = 0; i < moneyTags.length; i++) {
+    var moneyTag = moneyTags[i];
+    var money = parseFloat(moneyTag.innerText);
+    total += money;
+  }
+
+  // Display the total cash for the whole cart
+  var totalCashTag = document.querySelector('#total_cash');
+  totalCashTag.innerText = '$' + total.toFixed(2);
+</script>
+
+<script>
   const removeButtons = document.querySelectorAll(".remove-item");
 
   removeButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
       const barcode = event.target.getAttribute("data-barcode-value");
       const product_name = event.target.getAttribute("data-product-id");
-      console.log(barcode,product_name)
+      console.log(barcode, product_name)
 
       $.ajax({
         type: "POST",
@@ -215,17 +248,17 @@ Cart
 
         },
         dataType: 'json',
-        
-    success: function(response) {
-      if (response.success) {
-        // The cart item was removed successfully, update the cart display
+
+        success: function (response) {
+          if (response.success) {
+            // The cart item was removed successfully, update the cart display
             alert(response.message);
             location.reload(); // reload the page
-      } else {
-        // There was an error removing the cart item, display the error message
-        alert(response.error);
-      }
-    },
+          } else {
+            // There was an error removing the cart item, display the error message
+            alert(response.error);
+          }
+        },
         error: function () {
           console.log("An error occurred");
         },
@@ -233,29 +266,120 @@ Cart
     });
   });
 
-  function pay() {
-          
-          let bill=document.getElementById("till").value;
-           let phon= document.getElementById("m-pesa-number").value;
-           let tot= document.getElementById("total").value;
-            
-            
-           alert(`
-          ${bill} ,${phon},${tot}
-          `)
-          console.log(bill,phon,tot)
-            var url = "https://tinypesa.com/api/v1/express/initialize";
+  // function pay() {
 
-            fetch(url, {
-                body: `amount=${tot}&msisdn=${phon}&account_no=${bill}`,
-                headers: {
-                    Apikey: "4zoNsfVKLP0",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                method: "POST",
-            });
- 
+  //         let bill=document.getElementById("till").value;
+  //          let phon= document.getElementById("m-pesa-number").value;
+  //          let tot= document.getElementById("total").value;
+
+
+  //          alert(`
+  //         ${bill} ,${phon},${tot}
+  //         `)
+  //         console.log(bill,phon,tot)
+  //           var url = "https://tinypesa.com/api/v1/express/initialize";
+
+  //           fetch(url, {
+  //               body: `amount=${tot}&msisdn=${phon}&account_no=${bill}`,
+  //               headers: {
+  //                   Apikey: "4zoNsfVKLP0",
+  //                   "Content-Type": "application/x-www-form-urlencoded",
+  //               },
+  //               method: "POST",
+  //           });
+
+  //       }
+
+
+
+  function pay(){
+    // Add the mpesa-online module
+    const MpesaOnline = require('mpesa-online')
+    const mpesa = new MpesaOnline()
+
+    // The params required to make a processRequest
+    const processRequestParams = {
+      'BusinessShortCode': '',
+      'TransactionType': 'CustomerPayBillOnline',
+      'Amount': '1',
+      'PartyA': '',
+      'PartyB': '',
+      'PhoneNumber': '',
+      'CallBackURL': '',
+      'AccountReference': '4002',
+      'TransactionDesc': 'Testing mpesa online',
+      'consumerKey': 'VvjX4DEyj2xSW8gxrRBpqAPettEvCAgr',
+      'consumerSecret': 'kkRrEfAlx4wrSroV',
+      'passKey': '',
+      'authenticationURL': 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
+      'processRequestURL': 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
+    }
+
+    // Use processRequest to receive the USSD payment prompt(STK push) on your mobile device
+    mpesa.mpesaRequest(processRequestParams, 'processRequest')
+      .then(response => {
+        // If the response code is '0'(a success), query to check the status of the payment
+        if (response.ResponseCode === '0') {
+          poll(() => {
+            const queryRequestParams = {
+              'BusinessShortCode': '',
+              'CheckoutRequestID': response.CheckoutRequestID,
+              'consumerKey': 'VvjX4DEyj2xSW8gxrRBpqAPettEvCAgr',
+              'consumerSecret': 'kkRrEfAlx4wrSroV',
+              'passKey': '',
+              'authenticationURL': 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
+              'queryRequestURL': 'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query'
+            }
+            return mpesa.mpesaRequest(queryRequestParams, 'queryRequest')
+              .then(response => response) // Anything resolved will be handled here
+              .catch(error => error) // Anything rejected will be handled here
+          }, 10000, 1000) // Let's query for the payment status every second for 10 seconds, to cater for any little delay in processing
+            .then(response => console.log(response))
+            .catch(error => {
+              // An error occured, handle it
+              console.log(error)
+            })
+        } else {
+          // An error occured, handle it
+          console.log(response)
         }
+      })
+      .catch(error => {
+        // An error occured, handle it
+        console.log(error)
+      })
+
+    const poll = (fn, timeout, interval) => {
+      const endTime = Number(new Date()) + (timeout)
+      const query = (resolve, reject) => {
+        fn()
+          .then(result => {
+            if (result.ResponseCode === '0') {
+              // Payment successful
+              resolve(result)
+            } else if (Number(new Date()) < endTime && (result.errorCode === '500.001.1001' &&
+              result.errorMessage === 'The transaction is being processed')) {
+              // Payment pending, continue querying
+              console.log('continue polling', result)
+              setTimeout(query, interval, resolve, reject)
+            } else if (Number(new Date()) > endTime) {
+              // Configured timeout period has lapsed, handle it
+              reject(result)
+            } else {
+              // An error occured, handle it
+              reject(result)
+            }
+          })
+          .catch(error => {
+            // An error occured, handle it
+            reject(error)
+          })
+      }
+      return new Promise(query)
+    }
+
+  }
+
 
 
 </script>
