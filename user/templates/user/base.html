@@ -50,11 +50,7 @@
 
 
 
-<<<<<<< HEAD
-    <nav class="navbar navbar-expand navbar-primary navbar-dark ">
-=======
     <nav class="main-header navbar navbar-expand bg-pink bg-teal bg-info bg-success bg-primary bg-teal navbar-light">
->>>>>>> 245c89a1049156fbf42419bd11bbbe504fa28ddd
       <!-- Left navbar links -->
       <ul class="navbar-nav">
         <li class="nav-item">
@@ -86,54 +82,49 @@
         <li class="nav-item dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#">
             <i class="fas fa-question-circle"></i>
-            <span class="badge badge-danger navbar-badge">3</span>
+            <span class="badge badge-danger navbar-badge">0</span>
           </a>
           <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item">
               <!-- Message Start -->
               <div class="media">
-                <img src="dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                <!-- <img src="dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3"> -->
                 <div class="media-body">
-                  <h3 class="dropdown-item-title">
-                    Nora Silvester
-                    <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                  </h3>
-                  <p class="text-sm">The subject goes here</p>
-                  <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                  <p>on development</p>
                 </div>
               </div>
               <!-- Message End -->
             </a>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+            <!-- <a href="#" class="dropdown-item dropdown-footer">See All Messages</a> -->
           </div>
         </li>
         <!-- Notifications -->
         <li class="nav-item dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#">
             <i class="far fa-bell"></i>
-            <span class="badge badge-warning navbar-badge">15</span>
+            <span class="badge badge-warning navbar-badge">0</span>
           </a>
           <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <span class="dropdown-item dropdown-header">15 Notifications</span>
+            <span class="dropdown-item dropdown-header"> Notifications on development</span>
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item">
-              <i class="fas fa-envelope mr-2"></i> 4 new messages
-              <span class="float-right text-muted text-sm">3 mins</span>
+              <i class="fas fa-envelope mr-2"></i> 0 new messages
+              <span class="float-right text-muted text-sm">0 mins</span>
             </a>
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item">
-              <i class="fas fa-users mr-2"></i> 8 friend requests
-              <span class="float-right text-muted text-sm">12 hours</span>
+              <i class="fas fa-users mr-2"></i> 0 friend requests
+              <span class="float-right text-muted text-sm">0 hours</span>
             </a>
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item">
-              <i class="fas fa-file mr-2"></i> 3 new reports
-              <span class="float-right text-muted text-sm">2 days</span>
+              <i class="fas fa-file mr-2"></i> 0 new reports
+              <span class="float-right text-muted text-sm">0 days</span>
             </a>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+            <!-- <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a> -->
           </div>
         </li>
         <!-- Cart -->
@@ -150,6 +141,7 @@
                   <span class="badge badge-danger navbar-badge">0</span>
                 
 {% endif %}
+            
           </a>
         </li>
         {% endif %}
@@ -164,37 +156,22 @@
         <img src="" alt="" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">Qr System</span>
       </a>
-<<<<<<< HEAD
-      {% if user.is_authenticated %}
-=======
       
->>>>>>> 245c89a1049156fbf42419bd11bbbe504fa28ddd
 
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- Sidebar user (optional) -->
         {% if user.is_authenticated %}
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-<<<<<<< HEAD
-          <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
-
-          <div>
-            <span class="font-weight-bold " style="color: aliceblue;">{{user.username}}</span>
-=======
           <img src="{% static 'img/avatar3.png'%}" class="img-circle elevation-2" alt="User Image">
 
           <div>
             <span class="font-weight-bold pl-2" style="color: rgb(28, 100, 70);">{{user.username}}</span>
->>>>>>> 245c89a1049156fbf42419bd11bbbe504fa28ddd
           </div>
         </div>
         {% endif %}
 
-<<<<<<< HEAD
-
-=======
         {% if user.is_authenticated %}
->>>>>>> 245c89a1049156fbf42419bd11bbbe504fa28ddd
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
@@ -220,11 +197,8 @@
                 </p>
               </a>
             </li>
-<<<<<<< HEAD
-=======
       
 
->>>>>>> 245c89a1049156fbf42419bd11bbbe504fa28ddd
 
             <li class="nav-item">
               <a href="{% url "add" %}" class="nav-link">
@@ -232,11 +206,7 @@
                 {% if request.session.cart %}
                 <p>
                   Cart
-<<<<<<< HEAD
-                  <span class="badge badge-info right">0</span>
-=======
                   <span class="badge badge-info right">{{ request.session.cart|length }}</span>
->>>>>>> 245c89a1049156fbf42419bd11bbbe504fa28ddd
                 </p>
                 {% else %}
                 <p>
@@ -314,7 +284,13 @@
 
     {% endblock %}
   </div>
-
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2022-2023 <a href="">QRQUICK.io</a>.</strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+      <b>Version</b> 0.0.1
+    </div>
+  </footer>
   <!-- jQuery -->
   <script src="{% static 'user/assets/plugins/jquery/jquery.min.js' %}"></script>
   <!-- Bootstrap 4 -->

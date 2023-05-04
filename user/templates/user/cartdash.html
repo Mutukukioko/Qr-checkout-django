@@ -27,7 +27,7 @@ Scanner
         <div class="col-12">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Cartitem DataTable </h3>
+              <h3 class="card-title">Cartlog DataTable </h3>
             </div>
             <!-- /.card-header --> 
             <div class="card-body">
@@ -43,7 +43,7 @@ Scanner
                     <!-- <th>Action</th> -->
                   </tr>
 
-                  {% for i in carts %}
+                  {% for i in context.carts %}
                   <tr>
 
                     <td>{{ i.cart_id}}</td>
@@ -84,7 +84,7 @@ Scanner
               {% else %}
               <div class="text-center">
                 <img src="{% static 'img/no_cart.png' %}" class="img-fluid" alt="No Cart Items">
-                <h5 class="mt-3">User cart is empty</h5>
+                <h5 class="mt-3">cartlog is empty</h5>
                 <p class="text-muted">Add some items to your cart and start shopping.</p>
               </div>
               {% endif %}
@@ -104,5 +104,22 @@ Scanner
   </section>
   <!-- /.content -->
 </div>
+<script>
+  $(function () {
+  $("#example1").DataTable({
+    "responsive": true, "lengthChange": false, "autoWidth": false,
+    "buttons": [ "csv", "excel", "pdf", "print", "colvis"]
+  }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+  $('#example2').DataTable({
+    "paging": true,
+    "lengthChange": false,
+    "searching": false,
+    "ordering": true,
+    "info": true,
+    "autoWidth": false,
+    "responsive": true,
+  });
+});
+</script>
 
 {% endblock %}

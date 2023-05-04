@@ -36,10 +36,14 @@ Login
                   </form>
                 </div>
                 <div class="card-footer text-center pt-0 px-lg-2 px-1 bg-gradient-teal">
-                  <p class="mb-4 text-sm mx-auto">
+                  <p class="text-sm float-left">
                     Don't have an account?
                     <a href="{% url 'signup' %}" class="text-info text-gradient font-weight-bold">Sign up</a>
-                  </p>
+                  
+                    </p><br><p class="text-sm float-center"><a href="{% url 'password_reset' %}" class=" float-left text-white text-gradient ">
+                      forgort password?</a>
+                    </p>
+                    
                 </div>
               </div>
             </div>

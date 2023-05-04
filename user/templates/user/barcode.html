@@ -22,7 +22,11 @@ Add Products
                 {% endfor %}
             </div>
             {% endif %}
-
+            <div id="loading" style="display:none;">
+                <div class="overlay"></div>
+                <img src="{% static 'user/images/loading.gif' %}">
+            </div>
+            
 
             <br>
             <div class="row">
@@ -152,6 +156,18 @@ Add Products
                 { fps: 10, qrbox: 200 },
   /* verbose= */ false);
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+            $(document).ready(function () {
+                $('#scan-form').on('submit', function () {
+                    // Show loading gif
+                    $('#loading').show();
+                });
+
+                // Hide loading gif when response is received
+                $(document).ajaxComplete(function () {
+                    $('#loading').hide();
+                });
+            });
 
         </script>
 

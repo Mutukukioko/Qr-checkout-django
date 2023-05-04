@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "mpesa-online": "^1.0.11"
+  }
+}

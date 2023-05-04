@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-87k4%s2p1c_**mloj!2r_&!8ih4y&7was)4_p358(*slne5+&f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'channels',  
 
     'user',
@@ -134,10 +135,16 @@ MEDIA_URL='image/'
 
 # LOGIN_REDIRECT_URL ="signin"
 
-EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST="smtp.gmail.com"
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'imutkupc@gmail.com'
+EMAIL_HOST_PASSWORD = 'sozwdcksgyhdlhuc'
+
+BASE_URL = 'http://quickt.com'
+
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 MESSAGE_STORAGE_OPTIONS = {
     'cookie_expires': 86400,  # 1 day in seconds

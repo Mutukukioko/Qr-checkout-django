@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import logout_view
+from .views import PasswordResetConfirmView, PasswordResetView, logout_view
 from django.conf.urls.static import static
 from django.conf import settings
 urlpatterns = [
@@ -57,6 +57,9 @@ path('remove_item/', views.remove_item, name='remove_item'),
 path('shop_signout/',views.shop_signout, name='shop_signout'),
     #check your inventory
 path('userInventory/', views.inventory, name='inventory'),
+path('password_reset/', PasswordResetView.as_view(), name='password_reset'),
+path('password_reset/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,

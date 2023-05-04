@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractBaseUser, BaseUserManager
+
 import uuid
 from django.utils import timezone
 
@@ -52,20 +53,16 @@ class Cart(models.Model):
         return self.name
 
 
+
+class Repo(models.Model):
     
-class Item(models.Model):
-    CATEGORY = (
-        ('Kitchen','Home appliance'),
-        ('Cloths','Shoes'),
-        ('electricals','non electric'),
-    )
-    name = models.CharField(max_length=100)
-    shop = models.ForeignKey(Shop, on_delete = models.CASCADE)
-    category = models.CharField(max_length = 254, null=True, choices= CATEGORY)
+    name = models.CharField(max_length=100, default="")
+    shop = models.ForeignKey(Shop, on_delete = models.CASCADE,default="")
+    category = models.CharField(max_length = 254,default="")
     brand = models.CharField(max_length = 254,default = "" )
     quantity = models.CharField(max_length = 254, default = "")
-    barcode = models.CharField(max_length=100, unique=True)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
+    barcode = models.CharField(max_length=100, unique=True, default="")
+    price = models.DecimalField(max_digits=8, decimal_places=2,default="")
     image = models.ImageField(upload_to='item_images', null=True, blank=True)
 
     def __str__(self):
@@ -74,3 +71,42 @@ class Item(models.Model):
 
 
 
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None):
+        if not email:
+            raise ValueError('The Email field must be set')
+        user = self.model(email=self.normalize_email(email))
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password):
+        user = self.create_user(email=self.normalize_email(email), password=password)
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+class CustomUser(AbstractBaseUser):
+    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=30, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'email'
+
+    def __str__(self):
+        return self.email
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)

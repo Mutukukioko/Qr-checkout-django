@@ -1,5 +1,6 @@
 {% extends 'user/adminbase.html' %}
 {% load static %}
+{% load humanize %}
 {% block title %}
 analysis
 {% endblock %}
@@ -12,8 +13,8 @@ analysis
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>User Cartitem</h1>
+                <div class="col-sm-6 text-bold " style="display: flex; justify-content: center;">
+                    <h1>Sales</h1>
                 </div>
 
             </div>
@@ -73,19 +74,18 @@ analysis
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    
+
                                     <tr>
-                                        {% if product in top_selling_products%}
-                                        <td>{{result.product }}</td>
                                         {% for product in top_selling_products %}
-                                        <td>{{product.total}}</td>
-
+                                    <tr>
+                                        <td>{{ product.product__name }}</td>
+                                        <td>{{ product.total_sales }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="3">No products found</td>
+                                    </tr>
                                     {% endfor %}
-                                    {% else %}
-
-                                    <td colspan="2" style=""> Nothing sold</td>
-
-                                    {% endif%}
                                     </tr>
                                 </tbody>
                             </table>
@@ -99,10 +99,11 @@ analysis
                             <h3 class="box-title">Average Basket Size</h3>
                         </div>
                         <div class="box-body">
-                            <h4>Today: {{ daily_average_basket }}</h4>
-                            <h4>Weekly: {{ weekly_average_basket }}</h4>
-                            <h4>Monthly: {{ monthly_average_basket }}</h4>
+                            <h4>Today: {{ today_avg_basket_size.avg_basket_size }}</h4>
+                            <h4>Weekly: </h4>
+                            <h4>Monthly:{{ monthly_avg_basket_size.avg_basket_size|floatformat:"2" }}</h4>
                         </div>
+                    
                     </div>
                 </div>
             </div>
