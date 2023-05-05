@@ -29,6 +29,8 @@ path('scan/', views.ScanView.as_view(), name='scan'),
 path('result/', views.ResultView.as_view(), name='result'),
 path('shop/<int:shop_id>/', views.shop_detail, name='shop_detail'),
 path('generate_qrcode/', views.generate_qrcode, name='generate_qrcode'),
+path('sales_analysis/', views.sales_analysis, name="sales_analysis"),
+
 #user paths
     #home page
 path('',views.home,name="home"),

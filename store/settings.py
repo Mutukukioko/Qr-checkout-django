@@ -79,15 +79,15 @@ WSGI_APPLICATION = 'store.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Qrcheck',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'quickt',
+        'USER': 'mutuku',
+        'PASSWORD': 'Muvau254',
+        'HOST': '/var/run/postgresql',
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation

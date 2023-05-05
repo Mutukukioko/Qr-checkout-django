@@ -1,0 +1,91 @@
+{% extends 'user/adminbase.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}
+analysis
+{% endblock %}
+{% block content %}
+
+<!-- Content Wrapper. Contains page content -->
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6 text-bold " style="display: flex; justify-content: center;">
+                    <h1>Sales</h1>
+                </div>
+
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <h2>By Category</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Total Sales</th>
+                        <th>Number of Sales</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in category_sales %}
+                    <tr>
+                        <td>{{ row.product__category }}</td>
+                        <td>${{ row.total_sales }}</td>
+                        <td>{{ row.num_sales }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h2>By Brand</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Brand</th>
+                        <th>Total Sales</th>
+                        <th>Number of Sales</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in brand_sales %}
+                    <tr>
+                        <td>{{ row.product__brand }}</td>
+                        <td>${{ row.total_sales }}</td>
+                        <td>{{ row.num_sales }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h2>By Product</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Total Sales</th>
+                        <th>Number of Sales</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in product_sales %}
+                    <tr>
+                        <td>{{ row.product__name }}</td>
+                        <td>${{ row.total_sales }}</td>
+                        <td>{{ row.num_sales }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+        </div>
+    </section>
+</div>
+
+{% endblock %}

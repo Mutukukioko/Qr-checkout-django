@@ -249,7 +249,7 @@ def scanQr(request):
         'username': request.user.username,
         'image':shop.image.url,
         }
-    return render(request, 'user/scanQr.html')
+    return render(request, 'user/scanQr.html', context)
 
 # add products to product table
 @login_required(login_url='/signin')
@@ -387,6 +387,39 @@ def sales_analytics(request):
     }
 
     return render(request, 'user/sales_analytics.html', context)
+
+#sales analysis
+def sales_analysis(request):
+    # Aggregate sales data for each category
+    category_sales = Cart.objects.values('product__category').annotate(
+        total_sales=Sum('product__price'),
+        num_sales=Count('id')
+    )
+
+    # Aggregate sales data for each brand
+    brand_sales = Cart.objects.values('product__brand').annotate(
+        total_sales=Sum('product__price'),
+        num_sales=Count('id')
+    )
+
+    # Aggregate sales data for each product
+    product_sales = Cart.objects.values('product__name').annotate(
+        total_sales=Sum('product__price'),
+        num_sales=Count('id')
+    )
+    shop=Shop.objects.get(user_id=request.user)
+    context = {
+        'title': 'Scan Qr', 
+        'username': request.user.username,
+        'image':shop.image.url,
+        'category_sales': category_sales,
+        'brand_sales': brand_sales,
+        'product_sales': product_sales
+    
+        }
+    # Render the template with the sales data
+    return render(request, 'user/sales_analysis.html',context)
+
 
 # ________________USER____________________
 
