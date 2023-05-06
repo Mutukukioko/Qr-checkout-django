@@ -22,7 +22,6 @@ charset-normalizer==3.0.1
 click==8.0.3
 colorama==0.4.5
 comm==0.1.2
-command-not-found==0.3
 confection==0.0.4
 cryptography==40.0.2
 cymem==2.0.7
