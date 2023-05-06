@@ -60,15 +60,11 @@ joblib==1.2.0
 jsonpointer==2.3
 jsonschema==4.17.3
 keyring==23.8.2
-Kivy==2.1.0
-Kivy-Garden==0.1.5
 langcodes==3.3.0
-language-selector==0.1
 launchpadlib==1.10.16
 lazr.restfulclient==0.14.4
 lazr.uri==1.0.6
 lockfile==0.12.2
-louis==3.22.0
 Mako==1.1.3
 MarkupSafe==2.0.1
 matplotlib-inline==0.1.6
@@ -83,9 +79,6 @@ nbconvert==7.2.9
 nbformat==5.7.3
 nest-asyncio==1.5.6
 netifaces==0.11.0
-nltk==3.7
-notebook==6.5.2
-notebook_shim==0.2.2
 numpy==1.21.5
 oauthlib==3.2.0
 olefile==0.46
