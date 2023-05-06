@@ -96,7 +96,6 @@ pip-autoremove==0.10.0
 pip-check==2.8.1
 pipdeptree==2.7.0
 platformdirs==2.6.0
-pluggy==1.0.0+repack
 preshed==3.0.8
 prometheus-client==0.16.0
 prompt-toolkit==3.0.36
