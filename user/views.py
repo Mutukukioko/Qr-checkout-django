@@ -61,7 +61,11 @@ def signin(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            if user.is_superuser:
+            if user.is_superuser and user.username == 'mutuku':
+                login(request, user)
+                messages.success(request, f'Welcome {username} (Superuser)!')
+                return redirect('addhop')
+            elif user.is_superuser:
                 login(request, user)
                 messages.success(request, f'Welcome {username} (Superuser)!')
                 return redirect('admin_home')
@@ -967,4 +971,5 @@ class PasswordResetConfirmView(View):
 
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             return HttpResponseBadRequest('Invalid password reset link.')
+
 
