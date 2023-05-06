@@ -36,7 +36,6 @@ django-daraja==1.2.0
 django-debug-toolbar==4.0.0
 django-qrcode==0.3
 docutils==0.19
-duplicity==0.8.22
 executing==1.2.0
 fasteners==0.17.3
 fastjsonschema==2.16.2
