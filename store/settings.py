@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'store.wsgi.application'
 #}
 
 DATABASES = {
-"deafult":dj_database_url.parse(os.environ.get("DATABASE_URL"))
+"default":dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
 
 # Password validation
@@ -139,14 +139,9 @@ MEDIA_URL='image/'
 # LOGIN_REDIRECT_URL ="signin"
 
 # Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'imutkupc@gmail.com'
-EMAIL_HOST_PASSWORD = 'sozwdcksgyhdlhuc'
 
-BASE_URL = 'http://quickt.com'
+
+
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 MESSAGE_STORAGE_OPTIONS = {
