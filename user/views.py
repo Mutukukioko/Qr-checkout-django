@@ -64,7 +64,7 @@ def signin(request):
             if user.is_superuser and user.username == 'mutuku':
                 login(request, user)
                 messages.success(request, f'Welcome {username} (Superuser)!')
-                return redirect('addhop')
+                return redirect('add_shop')
             elif user.is_superuser:
                 login(request, user)
                 messages.success(request, f'Welcome {username} (Superuser)!')
