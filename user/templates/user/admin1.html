@@ -144,7 +144,47 @@
         <img src="" alt="" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-bold text-white">Qr System</span>
       </a>
-      
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          {% if user.is_authenticated %} 
+          <li class="nav-item">
+            <a href="{% url "logout" %}" class="nav-link">
+              <i class="nav-icon fas fa-sign-out-alt"></i>
+              <p>
+                Logout
+                <i class=""></i>
+              </p>
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a href="{% url "signin" %}" class="nav-link">
+              <i class="nav-icon fas fa-sign-in-alt"></i>
+              <p>
+                Login
+                <i class=""></i>
+              </p>
+            </a>
+          </li>
+
+
+          <li class="nav-item">
+            <a href="{% url "signup" %}" class="nav-link">
+              <i class="nav-icon fas fa-registered "></i>
+              <p>
+                Register
+                <i class=""></i>
+              </p>
+            </a>
+          </li>
+
+
+        </ul>
+        </li>
+        {% endif %}
+
+        </ul>
+      </nav>
   
       <!-- Sidebar -->
       <div class="sidebar">
