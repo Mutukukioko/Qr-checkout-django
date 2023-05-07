@@ -76,7 +76,7 @@ Scan Store
       let scanInterval;
 
       const startScan = () => {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: {exact:'environment'} } })
           .then((stream) => {
             video.srcObject = stream;
             video.play();
