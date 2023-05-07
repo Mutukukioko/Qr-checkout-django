@@ -75,89 +75,95 @@ Scan Store
 
       let scanInterval;
 
-      const startScan = () => {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: {exact:'environment'} } })
-          .then((stream) => {
-            video.srcObject = stream;
-            video.play();
-            stopScanButton.style.display = 'block';
-            startScanButton.style.display = 'none';
-            scanInterval = setInterval(scan, 100);
-          })
-          .catch((error) => {
-            console.error('Unable to access the camera.', error);
-          });
-      };
+const startScan = () => {
+  navigator.mediaDevices.enumerateDevices()
+    .then(devices => {
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      const backCamera = videoDevices.find(device => device.label.toLowerCase().includes('back'));
+      return navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: backCamera.deviceId } } });
+    })
+    .then((stream) => {
+      video.srcObject = stream;
+      video.play();
+      stopScanButton.style.display = 'block';
+      startScanButton.style.display = 'none';
+      scanInterval = setInterval(scan, 100);
+    })
+    .catch((error) => {
+      console.error('Unable to access the camera.', error);
+    });
+};
 
-      const stopScan = () => {
-        clearInterval(scanInterval);
-        video.srcObject.getTracks().forEach(track => track.stop());
-        startScanButton.style.display = 'block';
-        scanArea.style.display = 'none';
-      };
+const stopScan = () => {
+  clearInterval(scanInterval);
+  video.srcObject.getTracks().forEach(track => track.stop());
+  startScanButton.style.display = 'block';
+  scanArea.style.display = 'none';
+};
 
-      const scan = () => {
-        const width = video.videoWidth;
-        const height = video.videoHeight;
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, width, height);
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height);
-        if (code) {
-          console.log('qr-input value:', code.data);
-          //  update qr-input tag value
-          qr_input.value = code.data;
-
-
-          // qr-inputTag.innerText = code.data;
-          scanArea.style.display = 'none';
-          stopScan();
-          $.ajax({
-            url: '/check_shop/',
-            method: 'GET',
-            data: { 'qr_input': code.data, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
-            dataType: 'json',
-            success: function (result) {
-              if (result.success) {
-                var inputElement = document.getElementById('store_name');
-                // Update the shop name and image on the page
-                // $('#shop-name').text(data.name);
-                inputElement.value = result.name;
-                $('#shop-image').attr('src', result.image);
-                console.log(result.name)
-                // Set the text of the success span tag
-                $('#sucss').text(result.message);
-                // Hide the error span tag if it is visible
-                $('#error').hide();
-              } else {
+const scan = () => {
+  const width = video.videoWidth;
+  const height = video.videoHeight;
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, width, height);
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const code = jsQR(imageData.data, imageData.width, imageData.height);
+  if (code) {
+    console.log('qr-input value:', code.data);
+    //  update qr-input tag value
+    qr_input.value = code.data;
 
 
-                // Clear the shop name and image on the page
-                var store_name = document.getElementById('store_name');
-                store_name.value = '';
+    // qr-inputTag.innerText = code.data;
+    scanArea.style.display = 'none';
+    stopScan();
+    $.ajax({
+      url: '/check_shop/',
+      method: 'GET',
+      data: { 'qr_input': code.data, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+      dataType: 'json',
+      success: function (result) {
+        if (result.success) {
+          var inputElement = document.getElementById('store_name');
+          // Update the shop name and image on the page
+          // $('#shop-name').text(data.name);
+          inputElement.value = result.name;
+          $('#shop-image').attr('src', result.image);
+          console.log(result.name)
+          // Set the text of the success span tag
+          $('#sucss').text(result.message);
+          // Hide the error span tag if it is visible
+          $('#error').hide();
+        } else {
 
 
-                var store_barcode = document.getElementById('qr-input');
-                store_barcode.value = '';
-                // $('#store_name').text('');
-                $('#shop-image').attr('src', '');
+          // Clear the shop name and image on the page
+          var store_name = document.getElementById('store_name');
+          store_name.value = '';
 
-                var store_barcode = document.getElementById('error');
-                store_barcode.value = result.message;
 
-                // $('#msgs').text(data.message);
-                console.log("error the scanned value is invalid", result.message)
-                // Hide the error span tag if it is visible
-                $('#sucss').hide();
-                alert(result.message)
-              }
-            }
-          });
-         
+          var store_barcode = document.getElementById('qr-input');
+          store_barcode.value = '';
+          // $('#store_name').text('');
+          $('#shop-image').attr('src', '');
+
+          var store_barcode = document.getElementById('error');
+          store_barcode.value = result.message;
+
+          // $('#msgs').text(data.message);
+          console.log("error the scanned value is invalid", result.message)
+          // Hide the error span tag if it is visible
+          $('#sucss').hide();
+          alert(result.message)
         }
       }
+    });
+   
+  }
+}
+
       var btn = $('button[type="submit"]');
 
 // Disable the button by default
