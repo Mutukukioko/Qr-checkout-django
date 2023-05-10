@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'channels',  
-    'paypal.standard.ipn',
     'user',
 ]
 
