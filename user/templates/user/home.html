@@ -9,6 +9,18 @@ Home
 <!-- Main content -->
 <section class="content">
   <div class="container-fluid">
+    {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} " style="font-family: 'Times New Roman', Times, serif; font-weight: 300;" role="alert">
+        {{ message }}
+        <script>
+          setTimeout(function() {
+            $('.alert').fadeOut('fast');
+          }, 5000);
+        </script>
+      </div>
+    {% endfor %}
+  {% endif %}
     <!-- Small boxes (Stat box) -->
     <br>
     <div class="row">

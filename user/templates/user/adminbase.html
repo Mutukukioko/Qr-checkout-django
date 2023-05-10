@@ -35,8 +35,8 @@
   </title>
   {% if messages %}
   {% for message in messages %}
-    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} " style="font-family: 'Times New Roman', Times, serif; font-weight: 300;" role="alert">
-      {{ message }}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}" style="font-family: 'Times New Roman', Times, serif; font-weight: 300;" role="alert">
+      {{ message|safe }}
       <script>
         setTimeout(function() {
           $('.alert').fadeOut('fast');

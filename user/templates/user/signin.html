@@ -19,7 +19,7 @@ Login
                   <p class="mb-0">Enter Credentials to sign in</p>
                 </div>
                 <div class="card-body container-fluid">
-                  <form method="post" class="form-group">
+                  <form method="post" class="form-group" >
                     {% csrf_token %}
                     {% for field in form %}
                     <p>
@@ -32,19 +32,25 @@ Login
                     {% endfor %}
                     </p>
                     {% endfor %}
-                    <button type="submit" class="btn btn-light bg-gradient-teal">Login</button>
+                    <p style="justify-content: center; display: flex;"><button type="submit" class="btn btn-light bg-gradient-teal">Login</button></p>
                   </form>
                 </div>
                 <div class="card-footer text-center pt-0 px-lg-2 px-1 bg-gradient-teal">
-                  <p class="text-sm float-left">
+                  <p class="text-sm d-inline-block mb-0 mr-2">
                     Don't have an account?
-                    <a href="{% url 'signup' %}" class="text-info text-gradient font-weight-bold">Sign up</a>
+                  </p>
+                  <a href="{% url 'signup' %}" class="text-info text-gradient font-weight-bold">
+                    Sign up
+                  </a>
+                  <br>
                   
-                    </p><br><p class="text-sm float-center"><a href="{% url 'password_reset' %}" class=" float-left text-white text-gradient ">
-                      forgort password?</a>
-                    </p>
-                    
+                  <p class="text-sm d-inline-block mb-0 ml-2">
+                    <a href="{% url 'password_reset' %}" class="text-white text-gradient">
+                      Forgot password?
+                    </a>
+                  </p>
                 </div>
+                
               </div>
             </div>
             <div class="col-md-6">

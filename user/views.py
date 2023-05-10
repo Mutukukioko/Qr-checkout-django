@@ -30,10 +30,14 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.core.mail import send_mail
 from django.conf import settings
+from django.views.generic import FormView
+from django.urls import reverse
+from paypal.standard.forms import PayPalPaymentsForm
 
 
 def logout_view(request):
     logout(request)
+    messages.success(request,'Logged out successsfully')
     return redirect('signin')
 
 
@@ -973,3 +977,22 @@ class PasswordResetConfirmView(View):
             return HttpResponseBadRequest('Invalid password reset link.')
 
 
+
+
+class PaypalFormView(FormView):
+    template_name = 'paypal_form.html'
+    form_class = PayPalPaymentsForm
+
+    def get_initial(self):
+        return {
+            'business': 'harrison_mutuku@yahoo.com',
+            'amount': 1,
+            'currency_code': 'USD',
+            'item_name': 'Example item',
+            'invoice': 1234,
+            'notify_url': self.request.build_absolute_uri(reverse('paypal-ipn')),
+            'return_url': self.request.build_absolute_uri(reverse('paypal-return')),
+            'cancel_return': self.request.build_absolute_uri(reverse('paypal-cancel')),
+            'lc': 'EN',
+            'no_shipping': '1',
+        }

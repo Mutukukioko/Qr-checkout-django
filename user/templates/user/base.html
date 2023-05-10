@@ -36,20 +36,15 @@
     {{title}}
     {% endblock %}
   </title>
-  
+
+
 
 
 </head>
 
 <body class="layout-footer-fixed accent-navy control-sidebar-slide-open layout-navbar-fixed sidebar-collapse" style="height: auto; font-family: 'Times New Roman', Times, serif;">
-
-
   <div class="wrapper">
     <!-- Navbar -->
-
-
-
-
     <nav class="main-header navbar navbar-expand bg-pink bg-teal bg-info bg-success bg-primary bg-teal navbar-light">
       <!-- Left navbar links -->
       <ul class="navbar-nav">
@@ -275,11 +270,26 @@
           {% endif %}
 
           </ul>
+          
         </nav>
         <!-- /.sidebar-menu -->
       </div>
       <!-- /.sidebar -->
     </aside>
+   
+    {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} " style="font-family: 'Times New Roman', Times, serif; font-weight: 300;" role="alert">
+        {{ message }}
+        <script>
+          setTimeout(function() {
+            $('.alert').fadeOut('fast');
+          }, 5000);
+        </script>
+      </div>
+    {% endfor %}
+  {% endif %}
+    
     {% block content %}
 
     {% endblock %}
@@ -291,6 +301,7 @@
       <b>Version</b> 0.0.1
     </div>
   </footer>
+  
   <!-- jQuery -->
   <script src="{% static 'user/assets/plugins/jquery/jquery.min.js' %}"></script>
   <!-- Bootstrap 4 -->
