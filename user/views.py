@@ -30,9 +30,6 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.core.mail import send_mail
 from django.conf import settings
-from django.views.generic import FormView
-from django.urls import reverse
-from paypal.standard.forms import PayPalPaymentsForm
 
 
 def logout_view(request):
@@ -159,11 +156,8 @@ def add_shop(request):
         file_path = f"qrcodes/{filename}"
         default_storage.save(file_path, image_file)
         shop.qrcode.save(filename, image_file)
-        data = {'success': True,
-                'message': 'successs!!!!!!!'}
-        messages.success(request, 'success in saving data')
+        messages.success(request, 'The Shop has been successfully saved to the database')
 
-        return JsonResponse(data)
 
     else:
 

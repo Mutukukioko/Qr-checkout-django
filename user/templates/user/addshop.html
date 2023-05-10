@@ -11,12 +11,17 @@ Register Shop
     <div class="container-fluid">
       <br>
       {% if messages %}
-      <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-          {% endfor %}
-      </ul>
-      {% endif %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} " style="font-family: 'Times New Roman', Times, serif; font-weight: 300;" role="alert">
+        {{ message }}
+        <script>
+          setTimeout(function() {
+            $('.alert').fadeOut('fast');
+          }, 5000);
+        </script>
+      </div>
+    {% endfor %}
+  {% endif %}
       <br>
       <div class="row">
 
@@ -172,15 +177,6 @@ Register Shop
         }
         return cookieValue;
       }
-      // Add event listener to remove messages after they are displayed
-        document.addEventListener('DOMContentLoaded', function() {
-            var messages = document.querySelector('.messages');
-            if (messages) {
-                setTimeout(function() {
-                    messages.parentNode.removeChild(messages);
-                }, 5000);  // 5 seconds
-            }
-        });
 
       window.onload = function () {
         // select all form elements and set their value to an empty string
