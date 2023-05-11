@@ -30,7 +30,7 @@ Profile
                         </div>
                         <div class="col-md-5 border-right pt-1 ">
                             <div class="p-5 py-7 bg-gradient-teal ">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3" style="justify-content: center;">
                                     <h4 class="text-rig">Profile</h4>
                                 </div>
                                 <div class="row mt-2">
@@ -83,15 +83,15 @@ Profile
             <div class="modal fade" id="modal-lg">
                 <div class="modal-dialog modal-xs">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" class="">Edit Profile</h4>
+                        <div class="modal-header bg-gradient-teal">
+                            <h4 class="modal-title" class="text-bold">Edit Profile</h4>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
                             <!-- the body should be precise -->
-                            <div class="card card-primary card-outline">
+                            <div class="card card-teal card-outline">
                                 <div class="card-body box-profile">
                                     <form id="myForm">
 
@@ -108,15 +108,16 @@ Profile
                                             </li>
                                             <li class="list-group-item">
                                                 <b>Username </b> <input type="text" id="username"
-                                                    class="form-control float-right" value="{{username}}">
-                                            </li>
+                                                    class="form-control float-right" pattern="^[a-zA-Z0-9]+$" value="{{username}}">
+                                                    <p id="username-error" style="display: none; color: red;">Please enter a valid username.</p>
+                                                </li>
                                             <li class="list-group-item">
-                                                <b>Email</b> <input type="text" id="email"
+                                                <b>Email</b> <input type="email" id="email"
                                                     class="form-control float-right" value="{{email}}">
                                             </li>
                                         </ul>
 
-                                        <button type="submit" class="btn btn-block bg-gradient-info btn-flat"
+                                        <button type="submit" class="btn btn-block bg-gradient-teal btn-flat"
                                             data-toggle="modal" data-target="#modal-lg">Update</button>
 
                                         </button>
@@ -198,5 +199,24 @@ Profile
         return cookieValue;
     }
 </script>
+
+<script>
+function validateUsername() {
+  var username = document.getElementById("username").value;
+  var pattern = /^[a-zA-Z0-9_]{3,15}$/; // define the regular expression pattern
+
+  if (!pattern.test(username)) { // if the pattern does not match
+    document.getElementById("username-error").style.display = "block"; // display the error message
+  }
+}
+</script>
+In this example, the validateUsername() function is called when the user clicks outside of the input field (i.e., when the field loses focus). If the pattern defined in the regular expression does not match the value entered in the field, the error message with the ID username-error is displayed. If the pattern does match, the error message remains hidden (display: none;).
+
+
+
+
+
+
+
 
 {% endblock %}
