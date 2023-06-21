@@ -1,77 +1,24 @@
-{% extends 'user/base.html' %}
+{% extends 'user/authbase.html' %}
 {% block title%}
-<h1>signup</h1>
+signup
 {% endblock %}
 
 {% block content %}
-
-
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
-  <!-- Brand Logo -->
-  <a href="" class="brand-link">
-    <img src="" alt="" class="brand-image img-circle elevation-3" style="opacity: .8">
-    <span class="brand-text font-weight-light">Qr Admin</span>
-  </a>
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <!-- Sidebar user (optional) -->
-    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-
-      <div class="info">
-        <a href="#" class="d-block">{{username}}</a>
-      </div>
-    </div>
-
-
-    <!-- Sidebar Menu -->
-    <nav class="mt-2">
-      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-        <!-- Add icons to the links using the .nav-icon class
-         with font-awesome or any other icon font library -->
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-tachometer-alt"></i>
-            <p>
-              Dashboard
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Dashboard v1</p>
-              </a>
-            </li>
-
-        </li>
-      </ul>
-      </li>
-
-
-      </ul>
-    </nav>
-    <!-- /.sidebar-menu -->
-  </div>
-  <!-- /.sidebar -->
-</aside>
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
   <section class="content">
     <div class="container-fluid">
-
       <div class="page-header min-vh-75">
-        <div class="container">
-          <div class="row">
-            <div class="col-xl-4 col-lg-5 col-md-6 d-flex flex-column mx-auto">
-              <div class="card card-plain mt-8">
-                <div class="card-header pb-0 text-left bg-transparent">
+        <div class="container pt-2" style="justify-content: center;">
+          <div class="row" style="justify-content: center;">
+            <div class="col-md-4" >
+              <div class="card card-plain mt-8 ">
+                <div class="card-header  pb-0 text-left bg-teal">
                   <h3 class="font-weight-bolder text-info text-gradient">Welcome back</h3>
                   <p class="mb-0">Enter your credentials</p>
                 </div>
-                <div class="card-body">
-                  <form method="post" class="mx-1 mx-md-4">
+                <div class="card-body text-center" >
+                  <form method="post" >
                     {% csrf_token %}
                     {% for field in form %} 
                     <p>

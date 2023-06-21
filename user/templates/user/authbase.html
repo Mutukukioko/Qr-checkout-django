@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- ells the browser not to override the MIME type of the resource. -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">  
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'user/assets/plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'user/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet"
+    href="{% static 'user/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'user/assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'user/assets/dist/css/adminlte.min.css' %}">
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+  <script src="{% static 'user/assets/jsQR-master/dist/jsQR.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <!-- <script src="https://cdn.rawgit.com/LazarSoft/jsqrcode/master/src/qr_packed.js"></script> -->
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/turtlejs/0.9.1/turtle.min.js"></script>
+
+
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="{% static 'node_modules/html5-qrcode/html5-qrcode.min.js' %}"></script>
+
+  <title>
+    {% block title %}
+    {{title}}
+    {% endblock %}
+  </title>
+</head>
+<body class="layout-footer-fixed accent-navy control-sidebar-slide-open layout-navbar-fixed sidebar-collapse" style="height: auto; font-family: 'Times New Roman', Times, serif;">
+  <div class="wrapper">
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand bg-pink bg-teal bg-info bg-success bg-primary bg-teal navbar-light">
+      <!-- Left navbar links -->
+     
+      <!-- Right navbar links -->
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a href="{% url "signin" %}" class="nav-link">
+              <p>
+                Signin
+                <i class="nav-icon fas fa-sign-in-alt"></i>
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url "signup" %}" class="nav-link">
+             
+              <p>
+                Signup
+                <i class="nav-icon fas fa-sign-in-alt"></i>
+              </p>
+            </a>
+          </li>
+        
+        <!-- Cart -->
+      </ul>
+    </nav>
+   
+    {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} " style="font-family: 'Times New Roman', Times, serif; font-weight: 300;" role="alert">
+        {{ message }}
+        <script>
+          setTimeout(function() {
+            $('.alert').fadeOut('fast');
+          }, 5000);
+        </script>
+      </div>
+    {% endfor %}
+  {% endif %}
+    
+    {% block content %}
+
+    {% endblock %}
+  </div>
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2022-2023 <a href="">QRQUICK.io</a>.</strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+      <b>Version</b> 0.0.1
+    </div>
+  </footer>
+  
+  <!-- jQuery -->
+  <script src="{% static 'user/assets/plugins/jquery/jquery.min.js' %}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{% static 'user/assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- DataTables  & Plugins -->
+  <script src="{% static 'user/assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/jszip/jszip.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/pdfmake/pdfmake.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/pdfmake/vfs_fonts.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+  <script src="{% static 'user/assets/plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+  <!-- AdminLTE App -->
+  <script src="{% static 'user/assets/dist/js/adminlte.min.js' %}"></script>
+
+</body>
+
+</html>
