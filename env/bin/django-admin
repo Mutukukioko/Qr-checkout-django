@@ -1,4 +1,4 @@
-#!/home/mutuku/Documents/django-db/env/bin/python
+#!/home/mutuku/Documents/programs/projects/Qr-checkout-django/env/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
